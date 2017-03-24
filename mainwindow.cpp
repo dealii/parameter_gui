@@ -56,19 +56,39 @@ namespace dealii
 										// AnyKeyPressed: any key is pressed over an item
 
       tree_widget->setItemDelegate(new ParameterDelegate(1));			// set the delegate for editing items
-      setCentralWidget(tree_widget);
-										// connect: if the tree changes, the window will know
+
+      setCentralWidget(tree_widget);									// connect: if the tree changes, the window will know
+
+      connect(tree_widget, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT(set_documentation_text(QTreeWidgetItem *, QTreeWidgetItem *)));         // and connect
       connect(tree_widget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(tree_was_modified()));
+
+      QDockWidget *documentation_widget = new QDockWidget(tr("Parameter documentation:"), this);
+      documentation_text_widget = new QTextEdit(QString (""), documentation_widget);
+      documentation_text_widget->setReadOnly(true);
+
+      documentation_widget->setAllowedAreas(Qt::AllDockWidgetAreas);
+      documentation_widget->setWidget(documentation_text_widget);
+
+      addDockWidget(Qt::BottomDockWidgetArea, documentation_widget);
 
       create_actions();								// create window actions as "Open",...
       create_menus();								// and menus
       statusBar()->showMessage(tr("Ready, start editing by double-clicking or hitting F2!"));
       setWindowTitle(tr("[*]parameterGUI"));					// set window title
 
-      resize(800, 600);								// set window height and width
+      showMaximized();
 
       if (filename.size() > 3)							// if there is a file_name, try to load the file.
         load_file(filename);							// a vliad file has the xml extension, so we require size() > 3
+    }
+
+
+
+    void MainWindow::set_documentation_text(QTreeWidgetItem *selected_item,
+                                            QTreeWidgetItem *previous_item)
+    {
+      documentation_text_widget->clear();
+      documentation_text_widget->insertPlainText(selected_item->text(3));
     }
 
 

@@ -91,6 +91,13 @@ namespace dealii
 				      */
         void tree_was_modified();
 
+                                     /**
+                                      * A <tt>slot</tt> that is called when the active
+                                      * item has changed. It updates the documentation
+                                      * text in the documentation panel.
+                                      */
+        void set_documentation_text(QTreeWidgetItem *selected_item,
+                                    QTreeWidgetItem *previous_item);
       private:
 				     /**
 				      * Show an information dialog, how
@@ -124,10 +131,15 @@ namespace dealii
 				      * This functions writes the current @p filename to the window title.
 				      */
         void set_current_file (const QString  &filename);
+
 				     /**
 				      * This is the tree structure in which we store all parameters.
 				      */
         QTreeWidget * tree_widget;
+                                     /**
+                                      * This is the documentation text area.
+                                      */
+        QTextEdit *documentation_text_widget;
 				     /**
 				      * This menu provides all file actions as <tt>open</tt>, <tt>save</tt>, <tt>save as</tt>
 				      * and <tt>exit</tt>
