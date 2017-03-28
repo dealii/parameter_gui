@@ -188,7 +188,8 @@ namespace dealii
                   QString pattern_description = xml.readElementText();			// store it as text
                   parent->setText(5, pattern_description);
 											// show the type and default
-											// in the StatusLine
+											// in the StatusLine when
+											// hovering over column 0 or 1
                   parent->setStatusTip(0, "Type: " + pattern_description + "   Default: " + parent->text(2));
                   parent->setStatusTip(1, "Type: " + pattern_description + "   Default: " + parent->text(2));
 
