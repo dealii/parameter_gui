@@ -310,15 +310,15 @@ namespace dealii
           return false;
         };
 
-      if (filename.contains(".xml"))
+      if (filename.endsWith(".xml",Qt::CaseInsensitive))
         {
           XMLParameterWriter writer(tree_widget);                               // create a xml writer
           if (!writer.write_xml_file(&file))                                    // and write the xml file
             return false;
         }
-      else if (filename.contains(".prm"))
+      else if (filename.endsWith(".prm",Qt::CaseInsensitive))
         {
-          PRMParameterWriter  writer(tree_widget);                              // create a prm writer
+          PRMParameterWriter writer(tree_widget);                               // create a prm writer
           if (!writer.write_prm_file(&file))                                    // and write the prm file
             return false;
         }

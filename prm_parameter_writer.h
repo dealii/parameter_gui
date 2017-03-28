@@ -59,21 +59,21 @@ namespace dealii
 
       private:
         /**
-         * This function writes a given @p item of <tt>tree_widget</tt>
-         * to a file in prm format.
-         * If the @p item is a parameter it is written if its value differs
+         * This function creates a string that corresponds to the data written
+         * to a prm file for a given @p item of <tt>tree_widget</tt>.
+         * If the @p item is a parameter it is only written if its value differs
          * from its default value. If the @p item is a subsection, a start element
          * <code>subsection</code> is written and <tt>write_item</tt> is called
          * recursively to write the next <tt>item</tt>.
-         * If not items in this subsection differ from their default value then
+         * If no items in this subsection differ from their default values then
          * the subsection is not written.
          * @p indentation_level describes the level the current item belongs to.
          * 0 describes a top level item and each subsection increases the level
          * by one.
          *
          */
-        QString write_item (const QTreeWidgetItem *item,
-                            const unsigned int indentation_level);
+        QString item_to_string (const QTreeWidgetItem *item,
+                                const unsigned int indentation_level);
 
         /**
          * A pointer to the QTreeWidget structure

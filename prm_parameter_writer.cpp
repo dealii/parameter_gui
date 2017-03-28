@@ -35,7 +35,7 @@ namespace dealii
 										// loop over the elements
       for (int i = 0; i < tree_widget->topLevelItemCount(); ++i)
         {
-        const QString item_string = write_item(tree_widget->topLevelItem(i),0);
+        const QString item_string = item_to_string(tree_widget->topLevelItem(i),0);
         device->write(item_string.toAscii());
         }
 
@@ -44,8 +44,8 @@ namespace dealii
 
 
 
-    QString PRMParameterWriter::write_item(const QTreeWidgetItem *item,
-                                           const unsigned int indentation_level)
+    QString PRMParameterWriter::item_to_string(const QTreeWidgetItem *item,
+                                               const unsigned int indentation_level)
     {
       QString item_string;
 
@@ -53,7 +53,7 @@ namespace dealii
         {									// we have a parameter
           bool non_default_value;
 
-          if (item->text(5).contains("Double"))
+          if (item->text(5).startsWith("[Double"))
             non_default_value = item->data(1,Qt::DisplayRole).toReal() != item->data(2,Qt::DisplayRole).toReal();
           else
             non_default_value = item->data(1,Qt::DisplayRole).toString() != item->data(2,Qt::DisplayRole).toString();
@@ -70,7 +70,7 @@ namespace dealii
       else
         {
           for (int i = 0; i < item->childCount(); ++i)
-            item_string.push_back(write_item(item->child(i),indentation_level+1));
+            item_string.push_back(item_to_string(item->child(i),indentation_level+1));
 
           if (!item_string.isEmpty())
             {
