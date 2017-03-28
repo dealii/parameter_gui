@@ -20,6 +20,7 @@
 #include "parameter_delegate.h"
 #include "xml_parameter_reader.h"
 #include "xml_parameter_writer.h"
+#include "prm_parameter_writer.h"
 
 
 namespace dealii
@@ -121,9 +122,9 @@ namespace dealii
     bool MainWindow::save_as()
     {
       QString  file_name =							// open a file dialog
-                 QFileDialog::getSaveFileName(this, tr("Save XML Parameter File"),
+                 QFileDialog::getSaveFileName(this, tr("Save Parameter File"),
                                               QDir::currentPath(),
-                                              tr("XML Files (*.xml)"));
+                                              tr("XML Files (*.xml);;PRM Files (*.prm)"));
 
       if (file_name.isEmpty())							// if no file was selected
         return false;								// return false
@@ -329,10 +330,27 @@ namespace dealii
           return false;
         };
 
-      XMLParameterWriter  xml_writer(tree_widget);				// create a xml_writer
+      if (filename.endsWith(".xml",Qt::CaseInsensitive))
+        {
+          XMLParameterWriter writer(tree_widget);                               // create a xml writer
+          if (!writer.write_xml_file(&file))                                    // and write the xml file
+            return false;
+        }
+      else if (filename.endsWith(".prm",Qt::CaseInsensitive))
+        {
+          PRMParameterWriter writer(tree_widget);                               // create a prm writer
+          if (!writer.write_prm_file(&file))                                    // and write the prm file
+            return false;
+        }
+      else
+        {
+          QMessageBox::warning(this, tr("parameterGUI"),
+                                     tr("Unknown output format: %1.")
+                                     .arg(filename));
+          file.remove();
 
-      if (!xml_writer.write_xml_file(&file))					// and read the xml file
-        return false;
+          return false;
+        }
 
       statusBar()->showMessage(tr("File saved"), 2000);				// if we succeed, show a message
       set_current_file(filename);						// and reset the window

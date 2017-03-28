@@ -46,6 +46,7 @@ ADD_EXECUTABLE(parameter_gui_exe
   parameter_delegate.cpp
   xml_parameter_reader.cpp
   xml_parameter_writer.cpp
+  prm_parameter_writer.cpp
   ${SOURCE_MOC}
   ${SOURCE_RCC}
   )
