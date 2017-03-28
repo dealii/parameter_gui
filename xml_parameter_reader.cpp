@@ -176,13 +176,6 @@ namespace dealii
                 {
                   QString documentation = xml.readElementText();			// store it
                   parent->setText(3, documentation);
-
-                  if (!documentation.isEmpty())						// if there is a documentation,
-                    {
-                      parent->setToolTip(0, "Documentation: " + documentation);		// set Documentation as ToolTip for both columns
-                      parent->setToolTip(1, "Documentation: " + documentation);
-                      parent->setStatusTip(0, "Documentation: " + documentation);	// and as StatusTip for the first column also
-                    };
                 }
               else if (xml.isStartElement() && xml.name() == "pattern")			// if it is <pattern>
                 {
@@ -196,6 +189,7 @@ namespace dealii
                   parent->setText(5, pattern_description);
 											// show the type and default
 											// in the StatusLine
+                  parent->setStatusTip(0, "Type: " + pattern_description + "   Default: " + parent->text(2));
                   parent->setStatusTip(1, "Type: " + pattern_description + "   Default: " + parent->text(2));
 
 						// in order to store values as correct data types,
