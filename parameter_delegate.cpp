@@ -173,33 +173,28 @@ namespace dealii
             }
           else if (rx_selection.indexIn (pattern_description) != -1)		// and selections
             {
-              QComboBox * combo_box = new QComboBox(parent);			// we assume, that pattern_desctiption is of the form
-										// "Type: [Selection item1|item2| ....|item ]    "
-              std::vector<std::string> choices;					// list with the different items
-              std::string  tmp(pattern_description.toStdString());
+              QComboBox * combo_box = new QComboBox(parent);
 
-              if (tmp.find("[") != std::string::npos)				// delete all char before [
-                tmp.erase (0, tmp.find("[")+1);
+              // we assume, that pattern_description is of the form
+              // "Type: [Selection item1|item2| ....|item ]".
+              // Find the first space after the first '[',
+              // which indicates the start of the first option
+              int begin_pattern = pattern_description.indexOf("[");
+              begin_pattern = pattern_description.indexOf(" ",begin_pattern) + 1;
 
-              if (tmp.find("]") != std::string::npos)				// delete all char after ]
-                tmp.erase (tmp.find("]"),tmp.length());
+              // Find the last ']', which signals the end of the options
+              const int end_pattern = pattern_description.lastIndexOf("]");
 
-              if (tmp.find(" ") != std::string::npos)				// delete all char before " "
-                tmp.erase (0, tmp.find(" ")+1);
+              // Extract the options from the string
+              QString pattern = pattern_description.mid(begin_pattern,end_pattern-begin_pattern);
 
-              while (tmp.find('|') != std::string::npos)			// extract items
-                {
-                  choices.push_back(std::string(tmp, 0, tmp.find('|')));
-                  tmp.erase (0, tmp.find('|')+1);
-                };
+              // Remove trailing whitespaces
+              while (pattern.endsWith(' '))
+                pattern.chop(1);
 
-              if (tmp.find(" ") != std::string::npos)				// delete " "
-                tmp.erase (tmp.find(" "));
-
-              choices.push_back(tmp);						// add last item
-
-              for (unsigned int i=0; i<choices.size(); ++i)			// add items to the combo box
-                combo_box->addItem (tr(choices[i].c_str()), tr(choices[i].c_str()));
+              // Split the list
+              const QStringList choices = pattern.split("|");
+              combo_box->addItems(choices);
 
               combo_box->setEditable(false);
 
