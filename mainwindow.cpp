@@ -66,6 +66,7 @@ namespace dealii
       setCentralWidget(tree_widget);									// connect: if the tree changes, the window will know
 
       connect(tree_widget, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT(set_documentation_text(QTreeWidgetItem *, QTreeWidgetItem *)));         // and connect
+      connect(tree_widget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this, SLOT(item_changed(QTreeWidgetItem *, int)));         // and connect
       connect(tree_widget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(tree_was_modified()));
 
       QDockWidget *documentation_widget = new QDockWidget(tr("Parameter documentation:"), this);
@@ -95,6 +96,33 @@ namespace dealii
     {
       documentation_text_widget->clear();
       documentation_text_widget->insertPlainText(selected_item->text(3));
+    }
+
+    void MainWindow::item_changed(QTreeWidgetItem *item,
+                                  int column)
+    {
+      if (column != 1)
+        return;
+
+      bool has_default_value;
+
+      if (item->text(5).startsWith("[Double"))
+        has_default_value = item->data(1,Qt::DisplayRole).toReal() == item->data(2,Qt::DisplayRole).toReal();
+      else
+        has_default_value = item->data(1,Qt::DisplayRole).toString() == item->data(2,Qt::DisplayRole).toString();
+
+      if (has_default_value)
+        {
+          QFont font = item->font(1);
+          font.setWeight(QFont::Normal);
+          item->setFont(1,font);
+        }
+      else
+        {
+          QFont font = item->font(1);
+          font.setWeight(QFont::Bold);
+          item->setFont(1,font);
+        }
     }
 
 

@@ -104,6 +104,14 @@ namespace dealii
                                      * tree item should be set to its default value.
                                      */
         void set_to_default();
+
+                                    /**
+                                     * A <tt>slot</tt> that is called when any
+                                     * item value has changed. It updates the font depending
+                                     * on whether the item has a default value or not.
+                                     */
+        void item_changed(QTreeWidgetItem *item,
+                          int column);
       private:
 				     /**
 				      * Show an information dialog, how
