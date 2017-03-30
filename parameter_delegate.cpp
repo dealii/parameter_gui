@@ -243,11 +243,18 @@ namespace dealii
         {
           QString pattern_description = index.data(Qt::StatusTipRole).toString();	// load pattern description
 											// stored in the StatusLine
-          QRegExp  rx_filename("\\b(FileName)\\b"),
+
+
+          QRegExp  rx_string("\\b(Anything|MultipleSelection|List|Map)\\b"),
+                   rx_filename("\\b(FileName)\\b"),
                    rx_dirname("\\b(DirectoryName)\\b"),
                    rx_selection("\\b(Selection)\\b");
 
-          if (rx_filename.indexIn (pattern_description) != -1)				// if the type is "FileName"
+          if (rx_string.indexIn (pattern_description) != -1)                          // if the type is "Anything"
+            {
+              QItemDelegate::setEditorData(editor, index);
+            }
+          else if (rx_filename.indexIn (pattern_description) != -1)			// if the type is "FileName"
             {
               QString  file_name = index.data(Qt::DisplayRole).toString();
 
@@ -297,11 +304,16 @@ namespace dealii
           QString pattern_description = index.data(Qt::StatusTipRole).toString();	// load pattern description
 											// stored in the StatusLine
 
-          QRegExp  rx_filename("\\b(FileName)\\b"),
+          QRegExp  rx_string("\\b(Anything|MultipleSelection|List|Map)\\b"),
+                   rx_filename("\\b(FileName)\\b"),
                    rx_dirname("\\b(DirectoryName)\\b"),
                    rx_selection("\\b(Selection)\\b");
 
-          if (rx_filename.indexIn (pattern_description) != -1)				// if the type is "FileName"
+          if (rx_string.indexIn (pattern_description) != -1)                          // if the type is "Anything"
+            {
+              QItemDelegate::setModelData(editor, model, index);
+            }
+          else if (rx_filename.indexIn (pattern_description) != -1)				// if the type is "FileName"
             {
               BrowseLineEdit * filename_editor = qobject_cast<BrowseLineEdit *>(editor);	// set the text from the editor
               QString value = filename_editor->text();
