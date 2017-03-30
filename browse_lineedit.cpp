@@ -37,6 +37,7 @@ namespace dealii
 
       QHBoxLayout *layout = new QHBoxLayout;
 
+      layout->setContentsMargins(1,1,1,1);
       layout->addWidget(line_editor);
       layout->addWidget(browse_button);
       setLayout(layout);
@@ -106,6 +107,15 @@ namespace dealii
               name = QFileDialog::getOpenFileName(this, tr("Open File"),
                                                   QDir::currentPath(),
                                                   tr("All Files (*.*)"));
+              break;
+            };
+
+          case files:
+            {
+              QStringList names = QFileDialog::getOpenFileNames(this, tr("Open Files"),
+                                                  QDir::currentPath(),
+                                                  tr("All Files (*.*)"));
+              name = names.join(",");
               break;
             };
 
