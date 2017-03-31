@@ -98,6 +98,12 @@ namespace dealii
                                       */
         void set_documentation_text(QTreeWidgetItem *selected_item,
                                     QTreeWidgetItem *previous_item);
+
+                                    /**
+                                     * A <tt>slot</tt> that is called when the active
+                                     * tree item should be set to its default value.
+                                     */
+        void set_to_default();
       private:
 				     /**
 				      * Show an information dialog, how
@@ -150,6 +156,10 @@ namespace dealii
 				      * and <tt>about Qt</tt>
 				      */
         QMenu * help_menu;
+                                     /**
+                                      * This menu provides context menu options for the active tree item.
+                                      */
+        QMenu * context_menu;
 				     /**
 				      * QAction <tt>open</tt> a file.
 				      */
@@ -174,6 +184,11 @@ namespace dealii
 				      * QAction <tt>about</tt> Qt.
 				      */
         QAction * about_qt_act;
+                                     /**
+                                      * QAction <tt>set_to_default</tt>.
+                                      */
+        QAction * set_to_default_act;
+
 				     /**
 				      * This value stores the current <tt>filename</tt> we work on.
 				      */

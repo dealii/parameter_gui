@@ -50,6 +50,11 @@ namespace dealii
       tree_widget->setEditTriggers(QAbstractItemView::DoubleClicked|
                                    QAbstractItemView::SelectedClicked|
                                    QAbstractItemView::EditKeyPressed);
+
+      //Enable right click menu in tree
+      tree_widget->setContextMenuPolicy(Qt::ActionsContextMenu);
+      context_menu = new QMenu(tree_widget);
+
 										// set which actions will initiate item editing: Editing starts when:
 										// DoubleClicked: an item is double clicked
 										// SelectedClicked: clicking on an already selected item
@@ -90,6 +95,14 @@ namespace dealii
     {
       documentation_text_widget->clear();
       documentation_text_widget->insertPlainText(selected_item->text(3));
+    }
+
+
+
+    void MainWindow::set_to_default()
+    {
+      QTreeWidgetItem * current_item = tree_widget->currentItem();
+      current_item->setText(1,current_item->text(2));
     }
 
 
@@ -275,6 +288,10 @@ namespace dealii
       about_qt_act = new QAction(tr("About &Qt"), this);
       about_qt_act->setStatusTip(tr("Show the Qt library's About box"));
       connect(about_qt_act, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+
+      set_to_default_act = new QAction("Set to default",context_menu);
+      tree_widget->addAction(set_to_default_act);
+      connect(set_to_default_act, SIGNAL(triggered()), this, SLOT(set_to_default()));
     }
 
 
