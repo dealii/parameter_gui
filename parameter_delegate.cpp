@@ -101,7 +101,8 @@ namespace dealii
         {
           QString pattern_description = index.data(Qt::StatusTipRole).toString();	// load pattern description
 											// stored in the StatusLine
-          QRegExp  rx_string("\\b(Anything|MultipleSelection|List|Map)\\b"),
+          QRegExp  rx_string("\\b(Anything|MultipleSelection|Map)\\b"),
+                   rx_list("\\b(List)\\b"),
                    rx_filename("\\b(FileName)\\b"),	
                    rx_dirname("\\b(DirectoryName)\\b"),	
                    rx_integer("\\b(Integer)\\b"),
@@ -117,6 +118,28 @@ namespace dealii
                       this, SLOT(commit_and_close_editor()));				// to the closer function
 
               return line_editor;
+            }
+          else if (rx_list.indexIn (pattern_description) != -1)                         // if the type is "List"
+            {
+              if (rx_filename.indexIn (pattern_description) != -1)
+                {
+                  BrowseLineEdit * filename_editor =                                        // choose a BrowseLineEditor
+                      new BrowseLineEdit(BrowseLineEdit::files, parent);
+
+                  connect(filename_editor, SIGNAL(editingFinished()),
+                          this, SLOT(commit_and_close_editor()));
+
+                  return filename_editor;
+                }
+              else
+                {
+                  QLineEdit * line_editor = new QLineEdit(parent);                                // choose a LineEditor
+
+                  connect(line_editor, SIGNAL(editingFinished()),                           // and connect editors signal
+                          this, SLOT(commit_and_close_editor()));                           // to the closer function
+
+                  return line_editor;
+                }
             }
           else if (rx_filename.indexIn (pattern_description) != -1)			// if the type is "FileName"
             {
@@ -238,11 +261,33 @@ namespace dealii
         {
           QString pattern_description = index.data(Qt::StatusTipRole).toString();	// load pattern description
 											// stored in the StatusLine
-          QRegExp  rx_filename("\\b(FileName)\\b"),
+
+
+          QRegExp  rx_string("\\b(Anything|MultipleSelection|Map)\\b"),
+                   rx_list("\\b(List)\\b"),
+                   rx_filename("\\b(FileName)\\b"),
                    rx_dirname("\\b(DirectoryName)\\b"),
                    rx_selection("\\b(Selection)\\b");
 
-          if (rx_filename.indexIn (pattern_description) != -1)				// if the type is "FileName"
+          if (rx_string.indexIn (pattern_description) != -1)                          // if the type is "Anything"
+            {
+              QItemDelegate::setEditorData(editor, index);
+            }
+          else if (rx_list.indexIn (pattern_description) != -1)                   // if the type is "List"
+            {
+              if (rx_filename.indexIn (pattern_description) != -1)
+                {
+                  QString  file_name = index.data(Qt::DisplayRole).toString();
+
+                  BrowseLineEdit *filename_editor = qobject_cast<BrowseLineEdit *>(editor); // set the text of the editor
+                  filename_editor->setText(file_name);
+                }
+              else
+                {
+                  QItemDelegate::setEditorData(editor, index);
+                }
+            }
+          else if (rx_filename.indexIn (pattern_description) != -1)			// if the type is "FileName"
             {
               QString  file_name = index.data(Qt::DisplayRole).toString();
 
@@ -292,11 +337,30 @@ namespace dealii
           QString pattern_description = index.data(Qt::StatusTipRole).toString();	// load pattern description
 											// stored in the StatusLine
 
-          QRegExp  rx_filename("\\b(FileName)\\b"),
+          QRegExp  rx_string("\\b(Anything|MultipleSelection|Map)\\b"),
+                   rx_list("\\b(List)\\b"),
+                   rx_filename("\\b(FileName)\\b"),
                    rx_dirname("\\b(DirectoryName)\\b"),
                    rx_selection("\\b(Selection)\\b");
 
-          if (rx_filename.indexIn (pattern_description) != -1)				// if the type is "FileName"
+          if (rx_string.indexIn (pattern_description) != -1)                          // if the type is "Anything"
+            {
+              QItemDelegate::setModelData(editor, model, index);
+            }
+          else if (rx_list.indexIn (pattern_description) != -1)                   // if the type is "List"
+            {
+              if (rx_filename.indexIn (pattern_description) != -1)
+                {
+                  BrowseLineEdit * filename_editor = qobject_cast<BrowseLineEdit *>(editor);        // set the text from the editor
+                  QString value = filename_editor->text();
+                  model->setData(index, value);
+                }
+              else
+                {
+                  QItemDelegate::setModelData(editor, model, index);
+                }
+            }
+          else if (rx_filename.indexIn (pattern_description) != -1)				// if the type is "FileName"
             {
               BrowseLineEdit * filename_editor = qobject_cast<BrowseLineEdit *>(editor);	// set the text from the editor
               QString value = filename_editor->text();

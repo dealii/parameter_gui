@@ -54,7 +54,7 @@ namespace dealii
 				      * a <tt>directory</tt> dialog. This can be specified
 				      * in the constructor by setting this flag <tt>BrowseType</tt>.
 				      */
-        enum BrowseType {file = 0, directory = 1};
+        enum BrowseType {file = 0, directory = 1, files = 2};
 				     /**
 				      * Constructor. The type of the browse dialog can be specified
 				      * by the flag <tt>BrowseType</tt>, the default is <tt>file</tt>.
