@@ -29,11 +29,6 @@ namespace dealii
                      : QItemDelegate(parent)
     {
       this->value_column = value_column;
-
-      double_steps    = 0.1;			// any click in the editor will increase or decrease the value about double_steps
-      double_decimals = 14;			// number of decimals shown in the editor
-
-      int_steps = 1;				// step value for increasing or decreasing integers
     }
 
 
@@ -161,38 +156,48 @@ namespace dealii
 
               return dirname_editor;
             }
-          else if (rx_integer.indexIn (pattern_description) != -1)		// if the tpye is "Integer"
+          else if (rx_integer.indexIn (pattern_description) != -1)		// if the type is "Integer"
             {
-              QSpinBox * spin_box = new QSpinBox(parent);			// choose a spin box
+              const QStringList default_pattern = pattern_description.split(" ").filter("...");
+              const QStringList default_values = default_pattern[0].split("...");
 
-              const int min_int_value = std::numeric_limits<int>::min();
-              const int max_int_value = std::numeric_limits<int>::max();
+              QLineEdit * line_edit = new QLineEdit(parent);
+              line_edit->setValidator(new QIntValidator(default_values[0].toInt(), default_values[1].toInt(), line_edit));
 
-              spin_box->setMaximum(max_int_value);				// set max and min from the limits.h class
-              spin_box->setMinimum(min_int_value);
-              spin_box->setSingleStep(int_steps);				// and every klick is a SingleStep
-
-              connect(spin_box, SIGNAL(editingFinished()),			// connect editors signal to the closer function
+              connect(line_edit, SIGNAL(editingFinished()),			// connect editors signal to the closer function
                       this, SLOT(commit_and_close_editor()));
 
-              return spin_box;
+              return line_edit;
             }
           else if (rx_double.indexIn (pattern_description) != -1)		// the same with "Double"
             {
-              QDoubleSpinBox * double_spin_box = new QDoubleSpinBox(parent);	// choose a spin box
+              const QStringList default_pattern = pattern_description.split(" ").filter("...");
+              QStringList default_values = default_pattern[0].split("...");
 
-              const double min_double_value = -std::numeric_limits<double>::max();
-              const double max_double_value = std::numeric_limits<double>::max();
+              // Unfortunately conversion of MAX_DOUBLE to string and back fails
+              // sometimes, therefore use MAX_DOUBLE/2 to make sure we are below.
+              // In practice MAX_DOUBLE just means VERY large, it is normally not
+              // important how large.
+              const double max_double = std::numeric_limits<double>::max()/2;
+              const double min_double = std::numeric_limits<double>::min();
 
-              double_spin_box->setMaximum(max_double_value);		// set max and min from the limits.h class
-              double_spin_box->setMinimum(min_double_value);
-              double_spin_box->setDecimals(double_decimals);		// show "double_decimals" decimals
-              double_spin_box->setSingleStep(double_steps);		// and every klick is a SingleStep
+              default_values = default_values.replaceInStrings("MAX_DOUBLE",
+                                                               QVariant(max_double).toString());
+              default_values = default_values.replaceInStrings("MIN_DOUBLE",
+                                                               QVariant(min_double).toString());
 
-              connect(double_spin_box, SIGNAL(editingFinished()),		// connect editors signal to the closer function
+              const unsigned int number_of_decimals = 14;
+
+              QLineEdit * line_edit = new QLineEdit(parent);
+              line_edit->setValidator(new QDoubleValidator(default_values[0].toDouble(),
+                                                           default_values[1].toDouble(),
+                                                           number_of_decimals,
+                                                           line_edit));
+
+              connect(line_edit, SIGNAL(editingFinished()),		// connect editors signal to the closer function
                       this, SLOT(commit_and_close_editor()));
 
-              return double_spin_box;
+              return line_edit;
             }
           else if (rx_selection.indexIn (pattern_description) != -1)		// and selections
             {

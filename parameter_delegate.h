@@ -95,24 +95,6 @@ namespace dealii
 				      * The column this delegate will be used on.
 				      */
         int value_column;
-				     /**
-				      * For parameters of type <tt>double</tt> a spin box
-				      * will be shown as editor. Any click on the spin box
-				      * will change the value about <tt>double_steps</tt>.
-				      */
-        double  double_steps;
-				     /**
-				      * For parameters of type <tt>integer</tt> a spin box
-				      * will be shown as editor. Any click on the spin box
-				      * will change the value about <tt>int_steps</tt>.
-				      */
-        unsigned int  int_steps;
-				     /**
-				      * For parameters of type <tt>double</tt> a spin box
-				      * will be shown as editor. The spin box will show
-				      * parameters with a precision of <tt>double_decimals</tt>.
-				      */
-        unsigned int  double_decimals;
     };
   }
 /**@}*/
