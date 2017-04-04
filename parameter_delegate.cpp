@@ -179,12 +179,8 @@ namespace dealii
               // In practice MAX_DOUBLE just means VERY large, it is normally not
               // important how large.
               const double max_double = std::numeric_limits<double>::max()/2;
-              const double min_double = std::numeric_limits<double>::min();
-
               default_values = default_values.replaceInStrings("MAX_DOUBLE",
                                                                QVariant(max_double).toString());
-              default_values = default_values.replaceInStrings("MIN_DOUBLE",
-                                                               QVariant(min_double).toString());
 
               const unsigned int number_of_decimals = 14;
 
