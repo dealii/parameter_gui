@@ -21,8 +21,11 @@
 #include <QTreeWidget>
 #include <QDialog>
 #include <QSettings>
+#include <QToolBar>
+#include <QToolButton>
 
 #include "info_message.h"
+#include "settings_dialog.h"
 
 
 namespace dealii
@@ -112,6 +115,40 @@ namespace dealii
                                      */
         void item_changed(QTreeWidgetItem *item,
                           int column);
+
+        /**
+         * Show an information dialog, how
+         * parameters can be edited.
+         */
+        void show_settings ();
+
+        /**
+         * Apply the new settings to this window.
+         */
+        void apply_settings ();
+
+        /**
+         * Hide all default items in tree_widget if set in gui_settings.
+         * Otherwise restores all default values.
+         */
+        void update_visible_items();
+
+        /**
+         * Reads the font from gui_settings and applies it.
+         */
+        void update_font();
+
+        /**
+         * Changes whether default items should be displayed in the tree widget
+         * and calls update_visible_items() to apply the changes.
+         */
+        void toggle_visible_default_items();
+
+        /**
+         * Function that displays a font selection dialog, stores the result
+         * in gui_settings, and displays the new font.
+         */
+        void select_font();
       private:
 				     /**
 				      * Show an information dialog, how
@@ -126,6 +163,11 @@ namespace dealii
 				      * This function creates all menus.
 				      */
         void create_menus();
+
+        /**
+         * This function creates the toolbar.
+         */
+        void create_toolbar();
 				     /**
 				      * This function checks, if parameters were changed
 				      * and show a dialog, if changes should be saved.
@@ -146,6 +188,13 @@ namespace dealii
 				      */
         void set_current_file (const QString  &filename);
 
+        /**
+         * Determine if the item and all of its children have the default value,
+         * and hide all default items. Returns true if the item and all of its
+         * children have default values.
+         */
+        bool hide_default_item(QTreeWidgetItem *item);
+
 				     /**
 				      * This is the tree structure in which we store all parameters.
 				      */
@@ -154,6 +203,11 @@ namespace dealii
                                       * This is the documentation text area.
                                       */
         QTextEdit *documentation_text_widget;
+
+        /** A tool button that allows to toggle between showing/hiding parameters
+         * with default values.
+         */
+        QToolButton *hide_default;
 				     /**
 				      * This menu provides all file actions as <tt>open</tt>, <tt>save</tt>, <tt>save as</tt>
 				      * and <tt>exit</tt>
@@ -180,6 +234,10 @@ namespace dealii
 				      * QAction <tt>save as</tt> a file.
 				      */
         QAction * save_as_act;
+                                     /**
+                                      * QAction <tt>save as</tt> a file.
+                                      */
+        QAction * settings_act;
 				     /**
 				      * QAction <tt>exit</tt> the GUI.
 				      */
@@ -205,6 +263,9 @@ namespace dealii
 				      * This dialog shows a short information message after loading a file.
 				      */
         InfoMessage * info_message;
+
+        SettingsDialog * settings_dialog;
+
 				     /**
 				      * An object for storing user settings.
 				      */

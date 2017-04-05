@@ -32,8 +32,6 @@ namespace dealii
       QString  settings_file = QDir::currentPath() + "/settings.ini";		// a file for user settings
 
       gui_settings = new QSettings (settings_file, QSettings::IniFormat);	// load settings
-										// Up to now, we do not read any settings,
-										// but this can be used in the future for customizing the GUI.
 
       tree_widget = new QTreeWidget;						// tree for showing XML tags
 
@@ -80,6 +78,8 @@ namespace dealii
 
       create_actions();								// create window actions as "Open",...
       create_menus();								// and menus
+      create_toolbar();
+
       statusBar()->showMessage(tr("Ready, start editing by double-clicking or hitting F2!"));
       setWindowTitle(tr("[*]parameterGUI"));					// set window title
 
@@ -87,6 +87,8 @@ namespace dealii
 
       if (filename.size() > 3)							// if there is a file_name, try to load the file.
         load_file(filename);							// a vliad file has the xml extension, so we require size() > 3
+
+      apply_settings();
     }
 
 
@@ -116,6 +118,10 @@ namespace dealii
           QFont font = item->font(1);
           font.setWeight(QFont::Normal);
           item->setFont(1,font);
+
+          const bool hide_default_items = gui_settings->value("Settings/hideDefault", false).toBool();
+          if (hide_default_items)
+            item->setHidden(true);
         }
       else
         {
@@ -270,6 +276,86 @@ namespace dealii
 
 
 
+    void MainWindow::show_settings ()
+    {
+      settings_dialog = new SettingsDialog(gui_settings,this);
+
+      connect(settings_dialog, SIGNAL(accepted()), this, SLOT(apply_settings()));
+      settings_dialog->exec();
+      disconnect(settings_dialog, SIGNAL(accepted()), this, SLOT(apply_settings()));
+    }
+
+
+
+    void MainWindow::apply_settings ()
+    {
+      update_visible_items();
+      update_font();
+    }
+
+
+
+    void MainWindow::toggle_visible_default_items()
+    {
+      const bool hide_default_values = gui_settings->value("Settings/hideDefault", false).toBool();
+      gui_settings->setValue("Settings/hideDefault", !hide_default_values);
+      update_visible_items();
+    }
+
+
+
+    void MainWindow::update_visible_items()
+    {
+      const bool hide_default_values = gui_settings->value("Settings/hideDefault", false).toBool();
+
+      if (hide_default_values)
+        {
+        for (int i = 0; i < tree_widget->topLevelItemCount(); ++i)
+            hide_default_item(tree_widget->topLevelItem(i));
+        hide_default->setChecked(true);
+        }
+      else
+        {
+          QTreeWidgetItemIterator it(tree_widget,QTreeWidgetItemIterator::Hidden);
+          while (*it)
+            {
+              (*it)->setHidden(false);
+              ++it;
+            }
+          hide_default->setChecked(false);
+          }
+    }
+
+
+
+    bool MainWindow::hide_default_item(QTreeWidgetItem *item)
+    {
+      bool has_default_value = true;
+
+      if (item->childCount() == 0)
+        {
+          if (item->text(5).startsWith("[Double"))
+            has_default_value = item->data(1,Qt::DisplayRole).toReal() == item->data(2,Qt::DisplayRole).toReal();
+          else
+            has_default_value = item->data(1,Qt::DisplayRole).toString() == item->data(2,Qt::DisplayRole).toString();
+        }
+      else
+        {
+          for (int i = 0; i < item->childCount(); ++i)
+            {
+              const bool child_has_default_value = hide_default_item(item->child(i));
+              has_default_value = has_default_value & child_has_default_value;
+            }
+        }
+
+      if (has_default_value)
+        item->setHidden(true);
+
+      return has_default_value;
+    }
+
+
+
     void MainWindow::closeEvent(QCloseEvent *event)
     {
       if (maybe_save())								// reimplement the closeEvent from the QMainWindow class
@@ -317,6 +403,10 @@ namespace dealii
       about_qt_act->setStatusTip(tr("Show the Qt library's About box"));
       connect(about_qt_act, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
+      settings_act = new QAction(tr("Settings"), this);
+      settings_act->setStatusTip(tr("Show the Settings Dialog"));
+      connect(settings_act, SIGNAL(triggered()), this, SLOT(show_settings()));
+
       set_to_default_act = new QAction("Set to default",context_menu);
       tree_widget->addAction(set_to_default_act);
       connect(set_to_default_act, SIGNAL(triggered()), this, SLOT(set_to_default()));
@@ -330,6 +420,9 @@ namespace dealii
         file_menu->addAction(open_act);						// and add actions
         file_menu->addAction(save_act);
         file_menu->addAction(save_as_act);
+        file_menu->addSeparator();
+        file_menu->addAction(settings_act);
+        file_menu->addSeparator();
         file_menu->addAction(exit_act);
 
         menuBar()->addSeparator();
@@ -337,6 +430,32 @@ namespace dealii
         help_menu = menuBar()->addMenu(tr("&Help"));				// create a help menu
         help_menu->addAction(about_act);
         help_menu->addAction(about_qt_act);
+    }
+
+
+
+    void MainWindow::create_toolbar()
+    {
+      QToolBar *toolbar = new QToolBar(tr("Toolbar"),this);
+
+      toolbar->addAction(open_act);                                           // and add actions
+      toolbar->addAction(save_act);
+      toolbar->addAction(save_as_act);
+
+      toolbar->addSeparator();
+
+      hide_default = new QToolButton(toolbar);
+      hide_default->setText(tr("Hide default values"));
+      hide_default->setCheckable(true);
+      connect(hide_default, SIGNAL(clicked()), this, SLOT(toggle_visible_default_items()));
+      QAction *hide_default_act = toolbar->addWidget(hide_default);
+
+      QToolButton *change_font = new QToolButton(toolbar);
+      change_font->setText(tr("Change font"));
+      connect(change_font, SIGNAL(clicked()), this, SLOT(select_font()));
+      QAction *change_font_act = toolbar->addWidget(change_font);
+
+      addToolBar(toolbar);
     }
 
 
@@ -463,6 +582,33 @@ namespace dealii
 
       setWindowTitle(tr(win_title.c_str()));					// set the window title
       setWindowModified(false);							// and reset window modified
+    }
+
+
+
+    void MainWindow::update_font()
+    {
+      QString current_font_string = gui_settings->value("Settings/Font", QFont().toString()).toString();
+      QFont current_font;
+      current_font.fromString(current_font_string);
+      setFont(current_font);
+    }
+
+
+
+    void MainWindow::select_font()
+    {
+      QString current_font_string = gui_settings->value("Settings/Font", QFont().toString()).toString();
+      QFont current_font;
+      current_font.fromString(current_font_string);
+
+      bool ok;
+      QFont new_font = QFontDialog::getFont(
+                      &ok, current_font, this);
+      if (ok) {
+          gui_settings->setValue("Settings/Font", new_font.toString());
+          setFont(new_font);
+      }
     }
   }
 }

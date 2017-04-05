@@ -11,15 +11,19 @@ DESTDIR = ../../lib/bin
 # Input
 HEADERS += browse_lineedit.h \
            info_message.h \
+           settings_dialog.h \
            mainwindow.h \
            parameter_delegate.h \
            xml_parameter_reader.h \
-           xml_parameter_writer.h
+           xml_parameter_writer.h \
+           prm_parameter_writer.h
 SOURCES += browse_lineedit.cpp \
            info_message.cpp \
+           settings_dialog.cpp \
            main.cpp \
            mainwindow.cpp \
            parameter_delegate.cpp \
            xml_parameter_reader.cpp \
-           xml_parameter_writer.cpp
+           xml_parameter_writer.cpp \
+           prm_parameter_writer.cpp
 RESOURCES += application.qrc
