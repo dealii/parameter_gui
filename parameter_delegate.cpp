@@ -260,63 +260,22 @@ namespace dealii
     {
       if (index.column() == value_column)
         {
-          QString pattern_description = index.data(Qt::StatusTipRole).toString();	// load pattern description
-											// stored in the StatusLine
-
-
-          QRegExp  rx_string("\\b(Anything|MultipleSelection|Map)\\b"),
-                   rx_list("\\b(List)\\b"),
-                   rx_filename("\\b(FileName)\\b"),
-                   rx_dirname("\\b(DirectoryName)\\b"),
-                   rx_selection("\\b(Selection)\\b");
-
-          if (rx_string.indexIn (pattern_description) != -1)                          // if the type is "Anything"
+          if (BrowseLineEdit * filename_editor = qobject_cast<BrowseLineEdit *>(editor))
             {
-              QItemDelegate::setEditorData(editor, index);
-            }
-          else if (rx_list.indexIn (pattern_description) != -1)                   // if the type is "List"
-            {
-              if (rx_filename.indexIn (pattern_description) != -1)
-                {
-                  QString  file_name = index.data(Qt::DisplayRole).toString();
-
-                  BrowseLineEdit *filename_editor = qobject_cast<BrowseLineEdit *>(editor); // set the text of the editor
-                  filename_editor->setText(file_name);
-                }
-              else
-                {
-                  QItemDelegate::setEditorData(editor, index);
-                }
-            }
-          else if (rx_filename.indexIn (pattern_description) != -1)			// if the type is "FileName"
-            {
-              QString  file_name = index.data(Qt::DisplayRole).toString();
-
-              BrowseLineEdit *filename_editor = qobject_cast<BrowseLineEdit *>(editor);	// set the text of the editor
+              QString file_name = index.data(Qt::DisplayRole).toString();
               filename_editor->setText(file_name);
             }
-          else if (rx_dirname.indexIn (pattern_description) != -1)			// if the type is "DirectoryName"
-            {
-              QString  dir_name = index.data(Qt::DisplayRole).toString();
-
-              BrowseLineEdit *dirname_editor = qobject_cast<BrowseLineEdit *>(editor);	// set the text of the editor
-              dirname_editor->setText(dir_name);
-            }
-          else if (rx_selection.indexIn (pattern_description) != -1)			// if we have a combo box,
+          else if (QComboBox * combo_box = qobject_cast<QComboBox *>(editor))
             {
               QRegExp  rx(index.data(Qt::DisplayRole).toString());
 
-              QComboBox * combo_box = qobject_cast<QComboBox *>(editor);
-
-              for (int i=0; i<combo_box->count(); ++i)					// we look, which index
-                if (rx.exactMatch(combo_box->itemText(i)))				// the data has and set
-                  combo_box->setCurrentIndex(i);					// it to the combo_box
+              for (int i=0; i<combo_box->count(); ++i)                                  // we look, which index
+                if (rx.exactMatch(combo_box->itemText(i)))                              // the data has and set
+                  combo_box->setCurrentIndex(i);
             }
           else
-            QItemDelegate::setEditorData(editor, index);				// if it is not FileName,
-											// DirectoryName or Selection
-											// use the standard delegate
-        };
+            QItemDelegate::setEditorData(editor, index);
+        }
     }
 
 
@@ -335,54 +294,36 @@ namespace dealii
     {
       if (index.column() == value_column)
         {
-          QString pattern_description = index.data(Qt::StatusTipRole).toString();	// load pattern description
-											// stored in the StatusLine
-
-          QRegExp  rx_string("\\b(Anything|MultipleSelection|Map)\\b"),
-                   rx_list("\\b(List)\\b"),
-                   rx_filename("\\b(FileName)\\b"),
-                   rx_dirname("\\b(DirectoryName)\\b"),
-                   rx_selection("\\b(Selection)\\b");
-
-          if (rx_string.indexIn (pattern_description) != -1)                          // if the type is "Anything"
+          if (QLineEdit * line_edit = qobject_cast<QLineEdit *>(editor))
             {
-              QItemDelegate::setModelData(editor, model, index);
-            }
-          else if (rx_list.indexIn (pattern_description) != -1)                   // if the type is "List"
-            {
-              if (rx_filename.indexIn (pattern_description) != -1)
+              QString line_edit_content = line_edit->text();
+              int position = 0;
+
+              // If the editor has a validator, only accept the content if it contains
+              // correct input. Otherwise bad cases
+              // can happen, when some unfinished number violates the bounds, and
+              // the user clicks elsewhere to lose the focus of the editor.
+              if (line_edit->validator())
                 {
-                  BrowseLineEdit * filename_editor = qobject_cast<BrowseLineEdit *>(editor);        // set the text from the editor
-                  QString value = filename_editor->text();
-                  model->setData(index, value);
+                  if (line_edit->validator()->validate(line_edit_content,position) == QValidator::Acceptable)
+                    model->setData(index, line_edit_content);
                 }
               else
-                {
-                  QItemDelegate::setModelData(editor, model, index);
-                }
+                model->setData(index, line_edit_content);
             }
-          else if (rx_filename.indexIn (pattern_description) != -1)				// if the type is "FileName"
+          else if (BrowseLineEdit * filename_editor = qobject_cast<BrowseLineEdit *>(editor))
             {
-              BrowseLineEdit * filename_editor = qobject_cast<BrowseLineEdit *>(editor);	// set the text from the editor
               QString value = filename_editor->text();
               model->setData(index, value);
             }
-          else if (rx_dirname.indexIn (pattern_description) != -1)			// if the type is "DirectoryName"
+          else if (QComboBox * combo_box = qobject_cast<QComboBox *>(editor))
             {
-              BrowseLineEdit * dirname_editor = qobject_cast<BrowseLineEdit *>(editor);	// set the text from the editor
-              QString value = dirname_editor->text();
-              model->setData(index, value);
-            }
-          else if (rx_selection.indexIn (pattern_description) != -1)			// if the type is "Selection"
-            {
-              QComboBox * combo_box = qobject_cast<QComboBox *>(editor);		// set the text from the editor
               QString value = combo_box->currentText();
               model->setData(index, value);
             }
           else
-            QItemDelegate::setModelData(editor, model, index);				// if it is not FileName or DirectoryName,
-											// use the standard delegate
-        };
+            QItemDelegate::setModelData(editor, model, index);
+        }
     }
   }
 }
