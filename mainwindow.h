@@ -193,7 +193,7 @@ namespace dealii
          * and hide all default items. Returns true if the item and all of its
          * children have default values.
          */
-        bool hide_default_item(QTreeWidgetItem *item);
+        bool hide_item_with_default_value(QTreeWidgetItem *item);
 
 				     /**
 				      * This is the tree structure in which we store all parameters.

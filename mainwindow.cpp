@@ -119,8 +119,8 @@ namespace dealii
           font.setWeight(QFont::Normal);
           item->setFont(1,font);
 
-          const bool hide_default_items = gui_settings->value("Settings/hideDefault", false).toBool();
-          if (hide_default_items)
+          const bool hide_items_with_default_value = gui_settings->value("Settings/hideDefault", false).toBool();
+          if (hide_items_with_default_value)
             item->setHidden(true);
         }
       else
@@ -311,7 +311,7 @@ namespace dealii
       if (hide_default_values)
         {
         for (int i = 0; i < tree_widget->topLevelItemCount(); ++i)
-            hide_default_item(tree_widget->topLevelItem(i));
+            hide_item_with_default_value(tree_widget->topLevelItem(i));
         hide_default->setChecked(true);
         }
       else
@@ -328,7 +328,7 @@ namespace dealii
 
 
 
-    bool MainWindow::hide_default_item(QTreeWidgetItem *item)
+    bool MainWindow::hide_item_with_default_value(QTreeWidgetItem *item)
     {
       bool has_default_value = true;
 
@@ -341,9 +341,10 @@ namespace dealii
         }
       else
         {
+          // If this element has children recurse into them and check for default values
           for (int i = 0; i < item->childCount(); ++i)
             {
-              const bool child_has_default_value = hide_default_item(item->child(i));
+              const bool child_has_default_value = hide_item_with_default_value(item->child(i));
               has_default_value = has_default_value & child_has_default_value;
             }
         }
