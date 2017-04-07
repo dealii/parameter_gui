@@ -30,6 +30,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 QT4_WRAP_CPP(SOURCE_MOC
   browse_lineedit.h
   info_message.h
+  settings_dialog.h
   mainwindow.h
   parameter_delegate.h
   )
@@ -41,6 +42,7 @@ QT4_ADD_RESOURCES(SOURCE_RCC
 ADD_EXECUTABLE(parameter_gui_exe
   browse_lineedit.cpp
   info_message.cpp
+  settings_dialog.cpp
   main.cpp
   mainwindow.cpp
   parameter_delegate.cpp
