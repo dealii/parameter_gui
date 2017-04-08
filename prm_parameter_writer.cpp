@@ -32,7 +32,7 @@ namespace dealii
 
     bool PRMParameterWriter::write_prm_file(QIODevice *device)
     {
-										// loop over the elements
+      // loop over the elements
       for (int i = 0; i < tree_widget->topLevelItemCount(); ++i)
         {
         const QString item_string = item_to_string(tree_widget->topLevelItem(i),0);
@@ -49,8 +49,9 @@ namespace dealii
     {
       QString item_string;
 
-      if (item->childCount() == 0)						// if the "value"-entry of this item is not empty
-        {									// we have a parameter
+      // if the entry has no children we have a parameter
+      if (item->childCount() == 0)
+        {
           bool non_default_value;
 
           if (item->text(5).startsWith("[Double"))

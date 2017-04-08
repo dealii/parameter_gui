@@ -24,32 +24,32 @@
 
 namespace dealii
 {
-/*! @addtogroup ParameterGui
- *@{
- */
+  /*! @addtogroup ParameterGui
+   *@{
+   */
   namespace ParameterGui
   {
-/**
- * The SettingsDialog class implements a settings dialog for the parameterGUI.
- * The dialog shows all available settings, and when the user clicks on 'OK'
- * stores them in the QSettings object handed over in the constructor (which
- * in turn stores them on disk to allow persistent settings).
- *
- * @ingroup ParameterGui
- * @author Rene Gassmoeller, 2017
- */
+    /**
+     * The SettingsDialog class implements a settings dialog for the parameterGUI.
+     * The dialog shows all available settings, and when the user clicks on 'OK'
+     * stores them in the QSettings object handed over in the constructor (which
+     * in turn stores them on disk to allow persistent settings).
+     *
+     * @ingroup ParameterGui
+     * @author Rene Gassmoeller, 2017
+     */
     class SettingsDialog : public QDialog
     {
       Q_OBJECT
 
-      public:
+    public:
       /**
        * Constructor
        */
       SettingsDialog (QSettings *settings,
                       QWidget *parent = 0);
 
-      public slots:
+    public slots:
       /**
        * Function that displays a font selection dialog and stores the result.
        */
@@ -71,7 +71,7 @@ namespace dealii
        */
       void loadSettings();
 
-      private:
+    private:
       /**
        * This variable stores if the default values should be hidden. This
        * might seem duplicative, since it is also stored in <tt>settings</tt>,
@@ -88,30 +88,30 @@ namespace dealii
       /**
        * The <tt>Ok</tt> button.
        */
-      QPushButton * ok;
+      QPushButton *ok;
 
       /**
        * The <tt>Cancel</tt> button.
        */
-      QPushButton * cancel;
+      QPushButton *cancel;
 
       /**
        * The <tt>Change font</tt> button.
        */
-      QPushButton * change_font;
+      QPushButton *change_font;
 
       /**
        * The checkbox<tt>Hide default values</tt>.
        */
-      QCheckBox * hide_default;
+      QCheckBox *hide_default;
 
       /**
        * An object for storing <tt>settings</tt> in a file.
        */
-      QSettings * settings;
+      QSettings *settings;
     };
   }
-/**@}*/
+  /**@}*/
 }
 
 

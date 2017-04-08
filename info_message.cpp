@@ -26,48 +26,60 @@ namespace dealii
     InfoMessage::InfoMessage(QWidget *parent)
                : QDialog(parent, 0)
     {
-      show_again = true;						// this variable stores, if the
-									// the info message should be shown again
+      // this variable stores, if the
+      // the info message should be shown again
+      show_again = true;
       QGridLayout * grid = new QGridLayout(this);
 
-      icon = new QLabel(this);						// set an icon
+      // set an icon
+      icon = new QLabel(this);
 #ifndef QT_NO_MESSAGEBOX
       icon->setPixmap(QMessageBox::standardIcon(QMessageBox::Information));
       icon->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
 #endif
-      grid->addWidget(icon, 0, 0, Qt::AlignTop);			// add the icon in the upper left corner
+      // add the icon in the upper left corner
+      grid->addWidget(icon, 0, 0, Qt::AlignTop);
 
-      message = new QTextEdit(this);					// set the new message
+      // set the new message
+      message = new QTextEdit(this);
       message->setReadOnly(true);
-      grid->addWidget(message, 0, 1);					// and add the message on the right
 
-      again = new QCheckBox(this);					// add a check box
+      // and add the message on the right
+      grid->addWidget(message, 0, 1);
+
+      // add a check box
+      again = new QCheckBox(this);
       again->setChecked(true);
       again->setText(QErrorMessage::tr("&Show this message again"));
       grid->addWidget(again, 1, 1, Qt::AlignTop);
 
-      ok = new QPushButton(this);					// and finally a OK button
+      // and finally a OK button
+      ok = new QPushButton(this);
       ok->setText(QErrorMessage::tr("&OK"));
 #ifdef QT_SOFTKEYS_ENABLED
-      ok_action = new QAction(ok);					// define the action for the button
+      // define the action for the button
+      ok_action = new QAction(ok);
       ok_action->setSoftKeyRole(QAction::PositiveSoftKey);
       ok_action->setText(ok->text());
       connect(ok_action, SIGNAL(triggered()), this, SLOT(accept()));
       addAction(ok_action);
 #endif
       connect(ok, SIGNAL(clicked()), this, SLOT(accept()));
-      ok->setFocus();							// aand set the focus on the button
+      // and set the focus on the button
+      ok->setFocus();
       grid->addWidget(ok, 2, 0, 1, 2, Qt::AlignCenter);
 
       grid->setColumnStretch(1, 42);
       grid->setRowStretch(0, 42);
-									// load settings from an ini-file
+
+      // load settings from an ini-file
       QString  settings_file = QDir::currentPath() + "/settings.ini";
 
       settings = new QSettings (settings_file, QSettings::IniFormat);
 
-      settings->beginGroup("infoMessage");				// we store settings of this class in the
-      show_again = settings->value("showInformation", true).toBool();	//group infoMessage
+      // we store settings of this class in the group infoMessage
+      settings->beginGroup("infoMessage");
+      show_again = settings->value("showInformation", true).toBool();
       settings->endGroup();
     }
 
@@ -75,14 +87,16 @@ namespace dealii
 
     void InfoMessage::setInfoMessage(const QString &message)
     {
-      this->message->setText(message);					// set the message
+      // set the message
+      this->message->setText(message);
     }
 
 
 
     void InfoMessage::showMessage()
     {
-      if (show_again)							// and show the message
+      // and show the message
+      if (show_again)
         show();
     }
 
@@ -90,8 +104,9 @@ namespace dealii
 
     void InfoMessage::done(int r)
     {
-      if(!again->isChecked())						// if the box is not checked,
-        {								// store this to settings
+      // if the box is not checked, store this to settings
+      if(!again->isChecked())
+        {
           settings->beginGroup("infoMessage");
           settings->setValue("showInformation", false);
           settings->endGroup();

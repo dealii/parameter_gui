@@ -37,7 +37,8 @@ namespace dealii
     {
       if (index.column() == value_column)
         {
-          return QSize(400,30);		// we increase the height of all lines to show editors
+          // we increase the height of all lines to show editors
+          return QSize(400,30);
 
 /*
       QString pattern_description = index.data(Qt::StatusTipRole).toString();	// load pattern description
@@ -63,24 +64,29 @@ namespace dealii
     {
       if (index.column() == value_column)
         {
-          QString pattern_description = index.data(Qt::StatusTipRole).toString();	// load pattern description
-											// stored in the StatusLine
-          QRegExp  rx_string("\\b(FileName|DirectoryName)\\b");				// if the type is Filename
-											// or DirectoryName
+          // load pattern description stored in the StatusLine
+          QString pattern_description = index.data(Qt::StatusTipRole).toString();
+
+          QRegExp  rx_string("\\b(FileName|DirectoryName)\\b");
+
+          // if the type is Filename or DirectoryName
           if (rx_string.indexIn (pattern_description) != -1)
             {
-              QString value = index.model()->data(index, Qt::DisplayRole).toString();	// take the value
+              QString value = index.model()->data(index, Qt::DisplayRole).toString();
 
-              QStyleOptionViewItem my_option = option;					// load options
+              QStyleOptionViewItem my_option = option;
               my_option.displayAlignment = Qt::AlignLeft | Qt::AlignVCenter;
 
-              drawDisplay(painter, my_option, my_option.rect, value);			// print the text in the display
-              drawFocus(painter, my_option, my_option.rect);				// if the line has the
-											// focus, print a rectangle
+              // print the text in the display
+              drawDisplay(painter, my_option, my_option.rect, value);
+              // if the line has the focus, print a rectangle
+              drawFocus(painter, my_option, my_option.rect);
             }
           else
-            QItemDelegate::paint(painter, option, index);				// for all other types use
-											// the standard delegate
+            {
+              // for all other types use the standard delegate
+              QItemDelegate::paint(painter, option, index);
+            }
         }
       else
         QItemDelegate::paint(painter, option, index);
@@ -94,8 +100,9 @@ namespace dealii
     {
       if (index.column() == value_column)
         {
-          QString pattern_description = index.data(Qt::StatusTipRole).toString();	// load pattern description
-											// stored in the StatusLine
+          // load pattern description stored in the StatusLine
+          QString pattern_description = index.data(Qt::StatusTipRole).toString();
+
           QRegExp  rx_string("\\b(Anything|MultipleSelection|Map)\\b"),
                    rx_list("\\b(List)\\b"),
                    rx_filename("\\b(FileName)\\b"),	
@@ -105,20 +112,21 @@ namespace dealii
                    rx_selection("\\b(Selection)\\b"),
                    rx_bool("\\b(Bool)\\b");
 
-          if (rx_string.indexIn (pattern_description) != -1)				// if the type is "Anything"
+          // if the type is "Anything" choose a LineEditor
+          if (rx_string.indexIn (pattern_description) != -1)
             {
-              QLineEdit * line_editor = new QLineEdit(parent);				// choose a LineEditor
-
-              connect(line_editor, SIGNAL(editingFinished()),				// and connect editors signal
-                      this, SLOT(commit_and_close_editor()));				// to the closer function
+              QLineEdit * line_editor = new QLineEdit(parent);
+              connect(line_editor, SIGNAL(editingFinished()),
+                      this, SLOT(commit_and_close_editor()));
 
               return line_editor;
             }
-          else if (rx_list.indexIn (pattern_description) != -1)                         // if the type is "List"
+          else if (rx_list.indexIn (pattern_description) != -1)
             {
+              // if the type is "List" of files/directories choose a BrowseLineEditor
               if (rx_filename.indexIn (pattern_description) != -1)
                 {
-                  BrowseLineEdit * filename_editor =                                        // choose a BrowseLineEditor
+                  BrowseLineEdit * filename_editor =
                       new BrowseLineEdit(BrowseLineEdit::files, parent);
 
                   connect(filename_editor, SIGNAL(editingFinished()),
@@ -126,19 +134,21 @@ namespace dealii
 
                   return filename_editor;
                 }
+              // if the type is "List" of something else choose a LineEditor
               else
                 {
-                  QLineEdit * line_editor = new QLineEdit(parent);                                // choose a LineEditor
+                  QLineEdit * line_editor = new QLineEdit(parent);
 
-                  connect(line_editor, SIGNAL(editingFinished()),                           // and connect editors signal
-                          this, SLOT(commit_and_close_editor()));                           // to the closer function
+                  connect(line_editor, SIGNAL(editingFinished()),
+                          this, SLOT(commit_and_close_editor()));
 
                   return line_editor;
                 }
             }
-          else if (rx_filename.indexIn (pattern_description) != -1)			// if the type is "FileName"
+          // if the type is "FileName" choose a BrowseLineEditor
+          else if (rx_filename.indexIn (pattern_description) != -1)
             {
-              BrowseLineEdit * filename_editor =					// choose a BrowseLineEditor
+              BrowseLineEdit * filename_editor =
                                  new BrowseLineEdit(BrowseLineEdit::file, parent);
 
               connect(filename_editor, SIGNAL(editingFinished()),
@@ -146,9 +156,10 @@ namespace dealii
 
               return filename_editor;
             }
-          else if (rx_dirname.indexIn (pattern_description) != -1)			// if the type is "DirectoryName"
+          // if the type is "DirectoryName" choose a BrowseLineEditor
+          else if (rx_dirname.indexIn (pattern_description) != -1)
             {
-              BrowseLineEdit * dirname_editor =						// choose a BrowseLineEditor
+              BrowseLineEdit * dirname_editor =
                                  new BrowseLineEdit(BrowseLineEdit::directory, parent);
 
               connect(dirname_editor, SIGNAL(editingFinished()),
@@ -156,7 +167,8 @@ namespace dealii
 
               return dirname_editor;
             }
-          else if (rx_integer.indexIn (pattern_description) != -1)		// if the type is "Integer"
+          // if the type is "Integer" choose a LineEditor with appropriate bounds
+          else if (rx_integer.indexIn (pattern_description) != -1)
             {
               const QStringList default_pattern = pattern_description.split(" ").filter("...");
               const QStringList default_values = default_pattern[0].split("...");
@@ -164,12 +176,13 @@ namespace dealii
               QLineEdit * line_edit = new QLineEdit(parent);
               line_edit->setValidator(new QIntValidator(default_values[0].toInt(), default_values[1].toInt(), line_edit));
 
-              connect(line_edit, SIGNAL(editingFinished()),			// connect editors signal to the closer function
+              connect(line_edit, SIGNAL(editingFinished()),
                       this, SLOT(commit_and_close_editor()));
 
               return line_edit;
             }
-          else if (rx_double.indexIn (pattern_description) != -1)		// the same with "Double"
+          // if the type is "Double" choose a LineEditor with appropriate bounds
+          else if (rx_double.indexIn (pattern_description) != -1)
             {
               const QStringList default_pattern = pattern_description.split(" ").filter("...");
               QStringList default_values = default_pattern[0].split("...");
@@ -190,12 +203,13 @@ namespace dealii
                                                            number_of_decimals,
                                                            line_edit));
 
-              connect(line_edit, SIGNAL(editingFinished()),		// connect editors signal to the closer function
+              connect(line_edit, SIGNAL(editingFinished()),
                       this, SLOT(commit_and_close_editor()));
 
               return line_edit;
             }
-          else if (rx_selection.indexIn (pattern_description) != -1)		// and selections
+          // if the type is "Selection" choose a ComboBox
+          else if (rx_selection.indexIn (pattern_description) != -1)
             {
               QComboBox * combo_box = new QComboBox(parent);
 
@@ -222,25 +236,27 @@ namespace dealii
 
               combo_box->setEditable(false);
 
-              connect(combo_box, SIGNAL(currentIndexChanged(int)),		// connect editors signal to the closer function
+              connect(combo_box, SIGNAL(currentIndexChanged(int)),
                       this, SLOT(commit_and_close_editor()));
 
               return combo_box;
            }
-          else if (rx_bool.indexIn (pattern_description) != -1)			// and booleans
+          // if the type is "Bool" choose a ComboBox
+          else if (rx_bool.indexIn (pattern_description) != -1)
             {
               QComboBox * combo_box = new QComboBox(parent);
 
-              std::vector<std::string> choices;					// list with the different items
-              choices.push_back(std::string("true"));				// add true
-              choices.push_back(std::string("false"));				// and false
+              std::vector<std::string> choices;
+              choices.push_back(std::string("true"));
+              choices.push_back(std::string("false"));
 
-              for (unsigned int i=0; i<choices.size(); ++i)			// add items to the combo box
+              // add items to the combo box
+              for (unsigned int i=0; i<choices.size(); ++i)
                 combo_box->addItem (tr(choices[i].c_str()), tr(choices[i].c_str()));
 
               combo_box->setEditable(false);
 
-              connect(combo_box, SIGNAL(currentIndexChanged(int)),		// connect editors signal to the closer function
+              connect(combo_box, SIGNAL(currentIndexChanged(int)),
                       this, SLOT(commit_and_close_editor()));
 
               return combo_box;
@@ -251,7 +267,8 @@ namespace dealii
             };
         };
 
-      return 0;				// if it is not the column "parameter values", do nothing
+      // if it is not the column "parameter values", do nothing
+      return 0;
     }
 
 
@@ -269,8 +286,9 @@ namespace dealii
             {
               QRegExp  rx(index.data(Qt::DisplayRole).toString());
 
-              for (int i=0; i<combo_box->count(); ++i)                                  // we look, which index
-                if (rx.exactMatch(combo_box->itemText(i)))                              // the data has and set
+              // Preset ComboBox to the current selection
+              for (int i=0; i<combo_box->count(); ++i)
+                if (rx.exactMatch(combo_box->itemText(i)))
                   combo_box->setCurrentIndex(i);
             }
           else
