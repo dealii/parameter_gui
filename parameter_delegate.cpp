@@ -29,11 +29,6 @@ namespace dealii
                      : QItemDelegate(parent)
     {
       this->value_column = value_column;
-
-      double_steps    = 0.1;			// any click in the editor will increase or decrease the value about double_steps
-      double_decimals = 14;			// number of decimals shown in the editor
-
-      int_steps = 1;				// step value for increasing or decreasing integers
     }
 
 
@@ -161,38 +156,44 @@ namespace dealii
 
               return dirname_editor;
             }
-          else if (rx_integer.indexIn (pattern_description) != -1)		// if the tpye is "Integer"
+          else if (rx_integer.indexIn (pattern_description) != -1)		// if the type is "Integer"
             {
-              QSpinBox * spin_box = new QSpinBox(parent);			// choose a spin box
+              const QStringList default_pattern = pattern_description.split(" ").filter("...");
+              const QStringList default_values = default_pattern[0].split("...");
 
-              const int min_int_value = std::numeric_limits<int>::min();
-              const int max_int_value = std::numeric_limits<int>::max();
+              QLineEdit * line_edit = new QLineEdit(parent);
+              line_edit->setValidator(new QIntValidator(default_values[0].toInt(), default_values[1].toInt(), line_edit));
 
-              spin_box->setMaximum(max_int_value);				// set max and min from the limits.h class
-              spin_box->setMinimum(min_int_value);
-              spin_box->setSingleStep(int_steps);				// and every klick is a SingleStep
-
-              connect(spin_box, SIGNAL(editingFinished()),			// connect editors signal to the closer function
+              connect(line_edit, SIGNAL(editingFinished()),			// connect editors signal to the closer function
                       this, SLOT(commit_and_close_editor()));
 
-              return spin_box;
+              return line_edit;
             }
           else if (rx_double.indexIn (pattern_description) != -1)		// the same with "Double"
             {
-              QDoubleSpinBox * double_spin_box = new QDoubleSpinBox(parent);	// choose a spin box
+              const QStringList default_pattern = pattern_description.split(" ").filter("...");
+              QStringList default_values = default_pattern[0].split("...");
 
-              const double min_double_value = -std::numeric_limits<double>::max();
-              const double max_double_value = std::numeric_limits<double>::max();
+              // Unfortunately conversion of MAX_DOUBLE to string and back fails
+              // sometimes, therefore use MAX_DOUBLE/2 to make sure we are below.
+              // In practice MAX_DOUBLE just means VERY large, it is normally not
+              // important how large.
+              const double max_double = std::numeric_limits<double>::max()/2;
+              default_values = default_values.replaceInStrings("MAX_DOUBLE",
+                                                               QVariant(max_double).toString());
 
-              double_spin_box->setMaximum(max_double_value);		// set max and min from the limits.h class
-              double_spin_box->setMinimum(min_double_value);
-              double_spin_box->setDecimals(double_decimals);		// show "double_decimals" decimals
-              double_spin_box->setSingleStep(double_steps);		// and every klick is a SingleStep
+              const unsigned int number_of_decimals = 14;
 
-              connect(double_spin_box, SIGNAL(editingFinished()),		// connect editors signal to the closer function
+              QLineEdit * line_edit = new QLineEdit(parent);
+              line_edit->setValidator(new QDoubleValidator(default_values[0].toDouble(),
+                                                           default_values[1].toDouble(),
+                                                           number_of_decimals,
+                                                           line_edit));
+
+              connect(line_edit, SIGNAL(editingFinished()),		// connect editors signal to the closer function
                       this, SLOT(commit_and_close_editor()));
 
-              return double_spin_box;
+              return line_edit;
             }
           else if (rx_selection.indexIn (pattern_description) != -1)		// and selections
             {
@@ -259,63 +260,22 @@ namespace dealii
     {
       if (index.column() == value_column)
         {
-          QString pattern_description = index.data(Qt::StatusTipRole).toString();	// load pattern description
-											// stored in the StatusLine
-
-
-          QRegExp  rx_string("\\b(Anything|MultipleSelection|Map)\\b"),
-                   rx_list("\\b(List)\\b"),
-                   rx_filename("\\b(FileName)\\b"),
-                   rx_dirname("\\b(DirectoryName)\\b"),
-                   rx_selection("\\b(Selection)\\b");
-
-          if (rx_string.indexIn (pattern_description) != -1)                          // if the type is "Anything"
+          if (BrowseLineEdit * filename_editor = qobject_cast<BrowseLineEdit *>(editor))
             {
-              QItemDelegate::setEditorData(editor, index);
-            }
-          else if (rx_list.indexIn (pattern_description) != -1)                   // if the type is "List"
-            {
-              if (rx_filename.indexIn (pattern_description) != -1)
-                {
-                  QString  file_name = index.data(Qt::DisplayRole).toString();
-
-                  BrowseLineEdit *filename_editor = qobject_cast<BrowseLineEdit *>(editor); // set the text of the editor
-                  filename_editor->setText(file_name);
-                }
-              else
-                {
-                  QItemDelegate::setEditorData(editor, index);
-                }
-            }
-          else if (rx_filename.indexIn (pattern_description) != -1)			// if the type is "FileName"
-            {
-              QString  file_name = index.data(Qt::DisplayRole).toString();
-
-              BrowseLineEdit *filename_editor = qobject_cast<BrowseLineEdit *>(editor);	// set the text of the editor
+              QString file_name = index.data(Qt::DisplayRole).toString();
               filename_editor->setText(file_name);
             }
-          else if (rx_dirname.indexIn (pattern_description) != -1)			// if the type is "DirectoryName"
-            {
-              QString  dir_name = index.data(Qt::DisplayRole).toString();
-
-              BrowseLineEdit *dirname_editor = qobject_cast<BrowseLineEdit *>(editor);	// set the text of the editor
-              dirname_editor->setText(dir_name);
-            }
-          else if (rx_selection.indexIn (pattern_description) != -1)			// if we have a combo box,
+          else if (QComboBox * combo_box = qobject_cast<QComboBox *>(editor))
             {
               QRegExp  rx(index.data(Qt::DisplayRole).toString());
 
-              QComboBox * combo_box = qobject_cast<QComboBox *>(editor);
-
-              for (int i=0; i<combo_box->count(); ++i)					// we look, which index
-                if (rx.exactMatch(combo_box->itemText(i)))				// the data has and set
-                  combo_box->setCurrentIndex(i);					// it to the combo_box
+              for (int i=0; i<combo_box->count(); ++i)                                  // we look, which index
+                if (rx.exactMatch(combo_box->itemText(i)))                              // the data has and set
+                  combo_box->setCurrentIndex(i);
             }
           else
-            QItemDelegate::setEditorData(editor, index);				// if it is not FileName,
-											// DirectoryName or Selection
-											// use the standard delegate
-        };
+            QItemDelegate::setEditorData(editor, index);
+        }
     }
 
 
@@ -334,54 +294,36 @@ namespace dealii
     {
       if (index.column() == value_column)
         {
-          QString pattern_description = index.data(Qt::StatusTipRole).toString();	// load pattern description
-											// stored in the StatusLine
-
-          QRegExp  rx_string("\\b(Anything|MultipleSelection|Map)\\b"),
-                   rx_list("\\b(List)\\b"),
-                   rx_filename("\\b(FileName)\\b"),
-                   rx_dirname("\\b(DirectoryName)\\b"),
-                   rx_selection("\\b(Selection)\\b");
-
-          if (rx_string.indexIn (pattern_description) != -1)                          // if the type is "Anything"
+          if (QLineEdit * line_edit = qobject_cast<QLineEdit *>(editor))
             {
-              QItemDelegate::setModelData(editor, model, index);
-            }
-          else if (rx_list.indexIn (pattern_description) != -1)                   // if the type is "List"
-            {
-              if (rx_filename.indexIn (pattern_description) != -1)
+              QString line_edit_content = line_edit->text();
+              int position = 0;
+
+              // If the editor has a validator, only accept the content if it contains
+              // correct input. Otherwise bad cases
+              // can happen, when some unfinished number violates the bounds, and
+              // the user clicks elsewhere to lose the focus of the editor.
+              if (line_edit->validator())
                 {
-                  BrowseLineEdit * filename_editor = qobject_cast<BrowseLineEdit *>(editor);        // set the text from the editor
-                  QString value = filename_editor->text();
-                  model->setData(index, value);
+                  if (line_edit->validator()->validate(line_edit_content,position) == QValidator::Acceptable)
+                    model->setData(index, line_edit_content);
                 }
               else
-                {
-                  QItemDelegate::setModelData(editor, model, index);
-                }
+                model->setData(index, line_edit_content);
             }
-          else if (rx_filename.indexIn (pattern_description) != -1)				// if the type is "FileName"
+          else if (BrowseLineEdit * filename_editor = qobject_cast<BrowseLineEdit *>(editor))
             {
-              BrowseLineEdit * filename_editor = qobject_cast<BrowseLineEdit *>(editor);	// set the text from the editor
               QString value = filename_editor->text();
               model->setData(index, value);
             }
-          else if (rx_dirname.indexIn (pattern_description) != -1)			// if the type is "DirectoryName"
+          else if (QComboBox * combo_box = qobject_cast<QComboBox *>(editor))
             {
-              BrowseLineEdit * dirname_editor = qobject_cast<BrowseLineEdit *>(editor);	// set the text from the editor
-              QString value = dirname_editor->text();
-              model->setData(index, value);
-            }
-          else if (rx_selection.indexIn (pattern_description) != -1)			// if the type is "Selection"
-            {
-              QComboBox * combo_box = qobject_cast<QComboBox *>(editor);		// set the text from the editor
               QString value = combo_box->currentText();
               model->setData(index, value);
             }
           else
-            QItemDelegate::setModelData(editor, model, index);				// if it is not FileName or DirectoryName,
-											// use the standard delegate
-        };
+            QItemDelegate::setModelData(editor, model, index);
+        }
     }
   }
 }
