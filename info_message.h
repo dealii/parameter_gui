@@ -26,87 +26,87 @@
 
 namespace dealii
 {
-/*! @addtogroup ParameterGui
- *@{
- */
+  /*! @addtogroup ParameterGui
+   *@{
+   */
   namespace ParameterGui
   {
-/**
- * The InfoMessage class implements a special info message for the parameterGUI.
- * Besides showing a info message itself, the dialog shows a checkbox &quot;Show this message again&quot;.
- * If the user unchecks this box, this is stored in the &quot;settings.ini&quot; file and will be reloaded
- * the next time the user opens the parameterGUI. The intention of such a info message is the following.
- * The user should have some information on how using the GUI &quot;at hand&quot;
- * such as &quot;how to edit parameter values&quot; for example. But after reading this message, the user knows
- * it and the message should not appear permanently.
- *
- * @note This class is used in the graphical user interface for the @ref ParameterHandler class.
- *       It is not compiled into the deal.II libraries and can not be used by applications using deal.II.
- *
- * @ingroup ParameterGui
- * @author Martin Steigemann, Wolfgang Bangerth, 2010
- */
+    /**
+     * The InfoMessage class implements a special info message for the parameterGUI.
+     * Besides showing a info message itself, the dialog shows a checkbox &quot;Show this message again&quot;.
+     * If the user unchecks this box, this is stored in the &quot;settings.ini&quot; file and will be reloaded
+     * the next time the user opens the parameterGUI. The intention of such a info message is the following.
+     * The user should have some information on how using the GUI &quot;at hand&quot;
+     * such as &quot;how to edit parameter values&quot; for example. But after reading this message, the user knows
+     * it and the message should not appear permanently.
+     *
+     * @note This class is used in the graphical user interface for the @ref ParameterHandler class.
+     *       It is not compiled into the deal.II libraries and can not be used by applications using deal.II.
+     *
+     * @ingroup ParameterGui
+     * @author Martin Steigemann, Wolfgang Bangerth, 2010
+     */
     class InfoMessage : public QDialog
     {
       Q_OBJECT
 
-      public:
-				     /**
-				      * Constructor
-				      */
-        InfoMessage (QWidget *parent = 0);
-				     /**
-				      * With this function the @p message which will be shown in the
-				      * dialog can be set.
-				      */
-        void setInfoMessage(const QString &message);
+    public:
+      /**
+       * Constructor
+       */
+      InfoMessage (QWidget *parent = 0);
+      /**
+       * With this function the @p message which will be shown in the
+       * dialog can be set.
+       */
+      void setInfoMessage(const QString &message);
 
-      public slots:
-				     /**
-				      * Show the dialog with the <tt>message</tt>.
-				      */
-        void showMessage();
+    public slots:
+      /**
+       * Show the dialog with the <tt>message</tt>.
+       */
+      void showMessage();
 
-      protected:
-				     /**
-				      * Reimplemented from QDialog.
-				      */
-        void done(int r);
+    protected:
+      /**
+       * Reimplemented from QDialog.
+       */
+      void done(int r);
 
-      private:
-				     /**
-				      * This variable stores, if the <tt>message</tt> should be shown again the next time.
-				      */
-        bool show_again;
-				     /**
-				      * The <tt>Ok</tt> button.
-				      */
-        QPushButton * ok;
-				     /**
-				      * The checkbox<tt>Show this message again</tt>.
-				      */
-        QCheckBox * again;
-				     /**
-				      * The <tt>message</tt> editor.
-				      */
-        QTextEdit * message;
-				     /**
-				      * An <tt>icon</tt> for the dialog.
-				      */
-        QLabel * icon;
+    private:
+      /**
+       * This variable stores, if the <tt>message</tt> should be shown again the next time.
+       */
+      bool show_again;
+      /**
+       * The <tt>Ok</tt> button.
+       */
+      QPushButton *ok;
+      /**
+       * The checkbox<tt>Show this message again</tt>.
+       */
+      QCheckBox *again;
+      /**
+       * The <tt>message</tt> editor.
+       */
+      QTextEdit *message;
+      /**
+       * An <tt>icon</tt> for the dialog.
+       */
+      QLabel *icon;
 #ifdef QT_SOFTKEYS_ENABLED
-				     /**
-				      * A action for pressing the <tt>Ok</tt> button.
-				      */
-        QAction * ok_action;
+      /**
+       * A action for pressing the <tt>Ok</tt> button.
+       */
+      QAction *ok_action;
 #endif
-				     /**
-				      * An object for storing <tt>settings</tt> in a file.
-				      */
-        QSettings * settings;
+      /**
+       * An object for storing <tt>settings</tt> in a file.
+       */
+      QSettings *settings;
     };
   }
-/**@}*/
+  /**@}*/
 }
 
 
