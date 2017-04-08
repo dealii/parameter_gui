@@ -49,6 +49,7 @@ namespace dealii
        * The parameter values will be stored in @p tree_widget.
        */
       XMLParameterReader (QTreeWidget *tree_widget);
+
       /**
        * This function reads the parameters from @p device into the <tt>tree_widget</tt>.
        * We use the QXmlStreamReader class for this.
@@ -58,6 +59,7 @@ namespace dealii
        * otherwise an exception is thrown.
        */
       bool read_xml_file (QIODevice *device);
+
       /**
        * This function returns an error message.
        */
@@ -71,6 +73,7 @@ namespace dealii
        * or the end of the file is reached. In this case, an exception is thrown.
        */
       void parse_parameters ();
+
       /**
        * This functions parses a <tt>subsection</tt>.
        * and adds it as a child to @p parent.
@@ -79,6 +82,7 @@ namespace dealii
        * otherwise the function itself recursively.
        */
       void read_subsection_element (QTreeWidgetItem *parent);
+
       /**
        * This function parses a <tt>parameter</tt> and
        * and adds it as a child to @p parent.
@@ -94,27 +98,33 @@ namespace dealii
        * is thrown.
        */
       void read_parameter_element (QTreeWidgetItem *parent);
+
       /**
        * Reimplemented from the @ref ParameterHandler class.
        * Unmangle a string @p s into its original form.
        */
       QString  demangle (const QString &s);
+
       /**
        * This helper function creates a new child of @p item in the tree.
        */
       QTreeWidgetItem *create_child_item(QTreeWidgetItem *item);
+
       /**
        * The QXmlStreamReader object for reading XML elements.
        */
       QXmlStreamReader  xml;
+
       /**
        * A pointer to the tree structure.
        */
       QTreeWidget *tree_widget;
+
       /**
        * An icon for subsections in the tree structure.
        */
       QIcon  subsection_icon;
+
       /**
        * An icon for parameters in the tree structure.
        */

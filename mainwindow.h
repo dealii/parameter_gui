@@ -75,14 +75,17 @@ namespace dealii
        * Open a parameter file.
        */
       void open();
+
       /**
        * Save the parameter file.
        */
       bool save();
+
       /**
        * Open a file dialog to save the parameter file.
        */
       bool save_as();
+
       /**
        * Show some information on the parameterGUI
        */
@@ -155,19 +158,23 @@ namespace dealii
        * parameters can be edited.
        */
       void show_message ();
+
       /**
        * This function creates all actions.
        */
       void create_actions();
+
       /**
        * This function creates all menus.
        */
       void create_menus();
 
+
       /**
        * This function creates the toolbar.
        */
       void create_toolbar();
+
       /**
        * This function checks, if parameters were changed
        * and show a dialog, if changes should be saved.
@@ -175,14 +182,17 @@ namespace dealii
        * before open a new parameter file or before closing the GUI
        */
       bool maybe_save ();
+
       /**
        * Save parameters to @p filename in XML format.
        */
       bool save_file (const QString &filename);
+
       /**
        * Load parameters from @p filename in XML format.
        */
       void load_file (const QString &filename);
+
       /**
        * This functions writes the current @p filename to the window title.
        */
@@ -199,57 +209,70 @@ namespace dealii
        * This is the tree structure in which we store all parameters.
        */
       QTreeWidget *tree_widget;
+
       /**
        * This is the documentation text area.
        */
       QTextEdit *documentation_text_widget;
 
+
       /** A tool button that allows to toggle between showing/hiding parameters
        * with default values.
        */
       QToolButton *hide_default;
+
       /**
        * This menu provides all file actions as <tt>open</tt>, <tt>save</tt>, <tt>save as</tt>
        * and <tt>exit</tt>
        */
       QMenu *file_menu;
+
       /**
        * This menu provides some informations <tt>about</tt> the parameterGUI
        * and <tt>about Qt</tt>
        */
       QMenu *help_menu;
+
       /**
        * This menu provides context menu options for the active tree item.
        */
       QMenu *context_menu;
+
       /**
        * QAction <tt>open</tt> a file.
        */
       QAction *open_act;
+
       /**
        * QAction <tt>save</tt> a file.
        */
       QAction *save_act;
+
       /**
        * QAction <tt>save as</tt> a file.
        */
       QAction *save_as_act;
+
       /**
        * QAction <tt>save as</tt> a file.
        */
       QAction *settings_act;
+
       /**
        * QAction <tt>exit</tt> the GUI.
        */
       QAction *exit_act;
+
       /**
        * QAction <tt>about</tt> the parameterGUI.
        */
       QAction *about_act;
+
       /**
        * QAction <tt>about</tt> Qt.
        */
       QAction *about_qt_act;
+
       /**
        * QAction <tt>set_to_default</tt>.
        */
@@ -259,11 +282,15 @@ namespace dealii
        * This value stores the current <tt>filename</tt> we work on.
        */
       QString  current_file;
+
       /**
        * This dialog shows a short information message after loading a file.
        */
       InfoMessage *info_message;
 
+      /**
+       * This dialog shows the available settings.
+       */
       SettingsDialog *settings_dialog;
 
       /**

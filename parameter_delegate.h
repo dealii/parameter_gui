@@ -60,24 +60,29 @@ namespace dealii
        * of the parameter tree this delegate will be used on.
        */
       ParameterDelegate (const int value_column, QObject *parent = 0);
+
       /**
        * This function creates the appropriate editor for the parameter
        * based on the <tt>index</tt>.
        */
       QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                             const QModelIndex &index) const;
+
       /**
        * Reimplemented from QItemDelegate.
        */
       QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
       /**
        * Reimplemented from QItemDelegate.
        */
       void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
       /**
        * Reimplemented from QItemDelegate.
        */
       void setEditorData(QWidget *editor, const QModelIndex &index) const;
+
       /**
        * Reimplemented from QItemDelegate.
        */

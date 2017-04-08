@@ -40,13 +40,13 @@ namespace dealii
     {
       xml.setDevice(device);
 
-		// We look for a StartElement "ParameterHandler"
-		// and start parsing after this.
-		//  <ParameterHandler>
-		//   <subsection>
-		//    ...
-		//   </subsection>
-		//  </ParameterHandler>
+      // We look for a StartElement "ParameterHandler"
+      // and start parsing after this.
+      //  <ParameterHandler>
+      //   <subsection>
+      //    ...
+      //   </subsection>
+      //  </ParameterHandler>
 
       while (xml.readNext() != QXmlStreamReader::Invalid)
         {
@@ -80,13 +80,16 @@ namespace dealii
     {
       Q_ASSERT(xml.isStartElement() && xml.name() == "ParameterHandler");
 
-      while (xml.readNext() != QXmlStreamReader::Invalid)	// go to the next <start_element>
-        {							// if it is the closing element of ParameterHandler,
+      // go to the next <start_element>
+      while (xml.readNext() != QXmlStreamReader::Invalid)
+        {
+          // if it is the closing element of ParameterHandler, break the loop
           if (xml.isEndElement() && xml.name() == "ParameterHandler")
-            break;						// break the loop
+            break;
 
-          if (xml.isStartElement())				// if it is a start element
-            read_subsection_element(0);			// it must be a subsection or a parameter
+          // if it is a start element it must be a subsection or a parameter
+          if (xml.isStartElement())
+            read_subsection_element(0);
         };
     }
 
@@ -94,59 +97,68 @@ namespace dealii
 
     void XMLParameterReader::read_subsection_element(QTreeWidgetItem *parent)
     {
-		// The structure of the parameter file is assumed to be of the form
-		//
-		//  <subsection>
-		//    <subsection>
-		//      ...
-		//        <parameter>
-		//          <value> ... </value>
-		//          ...
-		//          <pattern_description> ... </pattern_description>
-		//        </parameter>
-		//        <parameter>
-		//        ...
-		//        </parameter>
-		//        ...
-		//    </subsection>
-		//    <subsection>
-		//      ...
-		//    </subsection>
-		//    ...
-		//  </subsection>
-		//
-		// Any subsection has a user-specified name also any parameter, but we do not know
-		// the userspecified names and we can not assume anything. So, when parsing the file,
-		// we do not know, if the actual <start_element> is a <subsection> or a <parameter>
-		// in a subsection. To decide, if the element is a subsection- or a parameter-name,
-		// we assume, that if the next <start_element> is <value>, we have a <parameter>
-		// and a parameter has the entries <value>, <default_value>, <documentation>,
-		// <pattern> and <pattern_description>
+      // The structure of the parameter file is assumed to be of the form
+      //
+      //  <subsection>
+      //    <subsection>
+      //      ...
+      //        <parameter>
+      //          <value> ... </value>
+      //          ...
+      //          <pattern_description> ... </pattern_description>
+      //        </parameter>
+      //        <parameter>
+      //        ...
+      //        </parameter>
+      //        ...
+      //    </subsection>
+      //    <subsection>
+      //      ...
+      //    </subsection>
+      //    ...
+      //  </subsection>
+      //
+      // Any subsection has a user-specified name also any parameter, but we do not know
+      // the userspecified names and we can not assume anything. So, when parsing the file,
+      // we do not know, if the actual <start_element> is a <subsection> or a <parameter>
+      // in a subsection. To decide, if the element is a subsection- or a parameter-name,
+      // we assume, that if the next <start_element> is <value>, we have a <parameter>
+      // and a parameter has the entries <value>, <default_value>, <documentation>,
+      // <pattern> and <pattern_description>
 
-      Q_ASSERT(xml.isStartElement());					// the actual element is <subsection>
+      // the actual element is <subsection>
+      Q_ASSERT(xml.isStartElement());
 
-      QTreeWidgetItem * subsection = create_child_item(parent);		// create a new subsection in the tree
+      // create a new subsection in the tree
+      QTreeWidgetItem * subsection = create_child_item(parent);
 
-      subsection->setIcon(0, subsection_icon);				// set the icon,
-      subsection->setText(0, demangle(xml.name().toString()));		// the name
+      subsection->setIcon(0, subsection_icon);
+      subsection->setText(0, demangle(xml.name().toString()));
 
-      tree_widget->setItemExpanded(subsection, 0);			// and the folder is not expanded
+      // the folder is not expanded
+      tree_widget->setItemExpanded(subsection, 0);
 
-      while (xml.readNext() != QXmlStreamReader::Invalid)		// read the next element
+      // read the next element
+      while (xml.readNext() != QXmlStreamReader::Invalid)
         {
-          if (xml.isEndElement())					// if the next element is </subsection>, break the loop
+          // if the next element is </subsection>, break the loop
+          if (xml.isEndElement())
             break;
 
-          if (xml.isStartElement())					// if it is a start element
+          if (xml.isStartElement())
             {
-              if (xml.name() == "value")				// it can be <value>, then we have found a parameter,
+              // it can be <value>, then we have found a parameter,
+              if (xml.name() == "value")
                 {
-                  subsection->setFlags(subsection->flags() | Qt::ItemIsEditable);	// values can be edited,
+                  // values can be edited
+                  subsection->setFlags(subsection->flags() | Qt::ItemIsEditable);
                   read_parameter_element (subsection);
                 }
-              else							// or it can be a new <subsection>
+              // or it can be a new <subsection>
+              else
                 {
-                  subsection->setFlags(subsection->flags() | Qt::NoItemFlags);		// subsections can not be edited,
+                  // subsections can not be edited
+                  subsection->setFlags(subsection->flags() | Qt::NoItemFlags);
                   read_subsection_element (subsection);
                 };
             };
@@ -157,74 +169,85 @@ namespace dealii
 
     void XMLParameterReader::read_parameter_element(QTreeWidgetItem *parent)
     {
-      Q_ASSERT(xml.isStartElement() && xml.name() == "value");		// the actual element is <value>,
-									// then we have found a parameter-item
-      QString value = xml.readElementText();				// read the element text
-      parent->setText(1, value);					// and store as text to the item
-      parent->setIcon(0, parameter_icon);				// change the icon of parent
+      // the actual element is <value>,
+      // then we have found a parameter-item
+      Q_ASSERT(xml.isStartElement() && xml.name() == "value");
 
-      while (xml.readNext() != QXmlStreamReader::Invalid)				// go to the next <start_element>
+      QString value = xml.readElementText();
+      // store as text to the item
+      parent->setText(1, value);
+      // change the icon of parent
+      parent->setIcon(0, parameter_icon);
+
+      // go to the next <start_element>
+      while (xml.readNext() != QXmlStreamReader::Invalid)
         {
           if (xml.isStartElement())
             {
-              if (xml.isStartElement() && xml.name() == "default_value")		// if it is <default_value>
+              // if it is <default_value> store it
+              if (xml.isStartElement() && xml.name() == "default_value")
                 {
-                  QString default_value = xml.readElementText();			// store it
+                  QString default_value = xml.readElementText();
                   parent->setText(2, default_value);
                 }
-              else if (xml.isStartElement() && xml.name() == "documentation")		// if it is <documentation>
+              // if it is <documentation> store it
+              else if (xml.isStartElement() && xml.name() == "documentation")
                 {
-                  QString documentation = xml.readElementText();			// store it
+                  QString documentation = xml.readElementText();
                   parent->setText(3, documentation);
                 }
-              else if (xml.isStartElement() && xml.name() == "pattern")			// if it is <pattern>
+              // if it is <pattern> store it as text,
+              // we only need this value for writing back to XML later
+              else if (xml.isStartElement() && xml.name() == "pattern")
                 {
-                  QString pattern = xml.readElementText();				// store it as text
-                  parent->setText(4, pattern);						// we only need this value
-											// for writing back to XML later
+                  QString pattern = xml.readElementText();
+                  parent->setText(4, pattern);
                 }
-              else if (xml.isStartElement() &&  xml.name() == "pattern_description")	// if it is <pattern_description>
+              // if it is <pattern_description> store it as text
+              else if (xml.isStartElement() &&  xml.name() == "pattern_description")
                 {
-                  QString pattern_description = xml.readElementText();			// store it as text
+                  QString pattern_description = xml.readElementText();
+
+                  // show the type and default
+                  // in the StatusLine when
+                  // hovering over column 0 or 1
                   parent->setText(5, pattern_description);
-											// show the type and default
-											// in the StatusLine when
-											// hovering over column 0 or 1
                   parent->setStatusTip(0, "Type: " + pattern_description + "   Default: " + parent->text(2));
                   parent->setStatusTip(1, "Type: " + pattern_description + "   Default: " + parent->text(2));
 
-						// in order to store values as correct data types,
-						// we check the following types in the pattern_description:
-
+                  // in order to store values as correct data types,
+                  // we check the following types in the pattern_description:
                   QRegExp  rx_string("\\b(Anything|FileName|DirectoryName|Selection|List|MultipleSelection)\\b"),	
                            rx_integer("\\b(Integer)\\b"),
                            rx_double("\\b(Float|Floating|Double)\\b"),
                            rx_bool("\\b(Selection true|false)\\b");
 
-                  if (rx_string.indexIn (pattern_description) != -1)			// the type "Anything" or "Filename"
+                  // store the type "Anything" or "Filename" as a QString
+                  if (rx_string.indexIn (pattern_description) != -1)
                     {
-                      QString value = parent->text(1);					// store as a QString
+                      QString value = parent->text(1);
 
-                      parent->setData(1, Qt::EditRole, value);				// and set the data in the item
+                      parent->setData(1, Qt::EditRole, value);
                       parent->setData(1, Qt::DisplayRole, value);
                     }
-                  else if (rx_integer.indexIn (pattern_description) != -1)		// if the tpye is "Integer"
+                  // store the type "Integer" as an int
+                  else if (rx_integer.indexIn (pattern_description) != -1)
                     {
                       QString text = parent->text(1);
 
                       bool ok = true;
+                      int value = text.toInt(&ok);
 
-                      int value = text.toInt(&ok);					// we convert the string to int
-
-                      if (ok)								// and store
+                      if (ok)
                         {
                           parent->setData(1, Qt::EditRole, value);
                           parent->setData(1, Qt::DisplayRole, value);
                         }
-                      else								// otherwise raise an error
+                      else
                         xml.raiseError(QObject::tr("Cannot convert integer type to integer!"));
                     }
-                  else if (rx_double.indexIn (pattern_description) != -1)		// the same with "Float"
+                  // store the type "Double" as an double
+                  else if (rx_double.indexIn (pattern_description) != -1)
                     {
                       QString text = parent->text(1);
 
@@ -239,9 +262,10 @@ namespace dealii
                         }
                       else
                         xml.raiseError(QObject::tr("Cannot convert double type to double!"));
-                    };
+                    }
 
-                  if (rx_bool.indexIn (pattern_description) != -1)				// and booleans
+                  // store the type "Bool" as an boolean
+                  if (rx_bool.indexIn (pattern_description) != -1)
                     {
                       QRegExp  test(parent->text(1));
 
@@ -254,36 +278,41 @@ namespace dealii
                       else
                         xml.raiseError(QObject::tr("Cannot convert boolen type to boolean!"));
 
-                      parent->setText(1, "");						// this is needed because we use
-                      parent->setData(1, Qt::EditRole, value);				// for booleans the standard
-                      parent->setData(1, Qt::DisplayRole, value);				// delegate
-                    };
+                      // this is needed because we use for booleans the standard delegate
+                      parent->setText(1, "");
+                      parent->setData(1, Qt::EditRole, value);
+                      parent->setData(1, Qt::DisplayRole, value);
+                    }
 
-                  break;									// and break the loop
+                  break;
                 }
+              // if there is any other element, raise an error
               else
-                {									// if there is any other element, raise an error
+                {
                   xml.raiseError(QObject::tr("Incomplete or unknown Parameter!"));
-                  break;								// and break the loop, here
-                };									// we assume the special structure
-            };										// of the parameter-file!
-        };
+                  break;
+                }
+            }
+        }
     }
 
 
 
     QTreeWidgetItem *XMLParameterReader::create_child_item(QTreeWidgetItem *item)
     {
-      QTreeWidgetItem * child_item;							// create a new child-item
+      // create a new child-item
+      QTreeWidgetItem * child_item;
 
+      // if item is not empty, append the new item as a child
       if (item)
-        child_item = new QTreeWidgetItem(item);						// if item is not empty,
-      else										// append the new item as a child
-        child_item = new QTreeWidgetItem(tree_widget);					// otherwise create a new item
-											// in the tree
+        child_item = new QTreeWidgetItem(item);
+      // otherwise create a new item in the tree
+      else
+        child_item = new QTreeWidgetItem(tree_widget);
 
-      child_item->setData(0, Qt::DisplayRole, xml.name().toString());			// set xml.tag_name as data
-      child_item->setText(0, xml.name().toString());					// set xml.tag_name as data
+      // set xml.tag_name as data
+      child_item->setData(0, Qt::DisplayRole, xml.name().toString());
+      child_item->setText(0, xml.name().toString());
 
       return child_item;
     }
@@ -292,7 +321,8 @@ namespace dealii
 
     QString XMLParameterReader::demangle (const QString &s)
     {
-      std::string  s_temp (s.toStdString()); 		// this function is copied from the ParameterHandler class
+      // this function is copied from the ParameterHandler class
+      std::string  s_temp (s.toStdString());
 
       std::string u;
       u.reserve (s_temp.size());
@@ -306,52 +336,52 @@ namespace dealii
 
             unsigned char c = 0;
             switch (s_temp[i+1])
-              {
-                case '0':  c = 0 * 16;  break;
-                case '1':  c = 1 * 16;  break;
-                case '2':  c = 2 * 16;  break;
-                case '3':  c = 3 * 16;  break;
-                case '4':  c = 4 * 16;  break;
-                case '5':  c = 5 * 16;  break;
-                case '6':  c = 6 * 16;  break;
-                case '7':  c = 7 * 16;  break;
-                case '8':  c = 8 * 16;  break;
-                case '9':  c = 9 * 16;  break;
-	    case 'a':  c = 10 * 16;  break;
-	    case 'b':  c = 11 * 16;  break;
-	    case 'c':  c = 12 * 16;  break;
-	    case 'd':  c = 13 * 16;  break;
-	    case 'e':  c = 14 * 16;  break;
-	    case 'f':  c = 15 * 16;  break;
-	    default:
-		  Q_ASSERT (false);
-	  }
+            {
+            case '0':  c = 0 * 16;  break;
+            case '1':  c = 1 * 16;  break;
+            case '2':  c = 2 * 16;  break;
+            case '3':  c = 3 * 16;  break;
+            case '4':  c = 4 * 16;  break;
+            case '5':  c = 5 * 16;  break;
+            case '6':  c = 6 * 16;  break;
+            case '7':  c = 7 * 16;  break;
+            case '8':  c = 8 * 16;  break;
+            case '9':  c = 9 * 16;  break;
+            case 'a':  c = 10 * 16;  break;
+            case 'b':  c = 11 * 16;  break;
+            case 'c':  c = 12 * 16;  break;
+            case 'd':  c = 13 * 16;  break;
+            case 'e':  c = 14 * 16;  break;
+            case 'f':  c = 15 * 16;  break;
+            default:
+              Q_ASSERT (false);
+            }
 	switch (s_temp[i+2])
-	  {
-	    case '0':  c += 0;  break;
-	    case '1':  c += 1;  break;
-	    case '2':  c += 2;  break;
-	    case '3':  c += 3;  break;
-	    case '4':  c += 4;  break;
-	    case '5':  c += 5;  break;
-	    case '6':  c += 6;  break;
-	    case '7':  c += 7;  break;
-	    case '8':  c += 8;  break;
-	    case '9':  c += 9;  break;
-	    case 'a':  c += 10;  break;
-	    case 'b':  c += 11;  break;
-	    case 'c':  c += 12;  break;
-	    case 'd':  c += 13;  break;
-	    case 'e':  c += 14;  break;
-	    case 'f':  c += 15;  break;
-	    default:
-		  Q_ASSERT (false);
-	  }
+	{
+	case '0':  c += 0;  break;
+	case '1':  c += 1;  break;
+	case '2':  c += 2;  break;
+	case '3':  c += 3;  break;
+	case '4':  c += 4;  break;
+	case '5':  c += 5;  break;
+	case '6':  c += 6;  break;
+	case '7':  c += 7;  break;
+	case '8':  c += 8;  break;
+	case '9':  c += 9;  break;
+	case 'a':  c += 10;  break;
+	case 'b':  c += 11;  break;
+	case 'c':  c += 12;  break;
+	case 'd':  c += 13;  break;
+	case 'e':  c += 14;  break;
+	case 'f':  c += 15;  break;
+	default:
+	  Q_ASSERT (false);
+	}
 
-    	u.push_back (static_cast<char>(c));
+	u.push_back (static_cast<char>(c));
 
-					 // skip the two characters
-	    i += 2;
+	// skip the two characters
+	i += 2;
           }
 
       QString  v (u.c_str());

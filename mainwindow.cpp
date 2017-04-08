@@ -29,22 +29,23 @@ namespace dealii
   {
     MainWindow::MainWindow(const QString  &filename)
     {
-      QString  settings_file = QDir::currentPath() + "/settings.ini";		// a file for user settings
+      // a file for user settings
+      QString  settings_file = QDir::currentPath() + "/settings.ini";
 
-      gui_settings = new QSettings (settings_file, QSettings::IniFormat);	// load settings
+      // load settings
+      gui_settings = new QSettings (settings_file, QSettings::IniFormat);
 
-      tree_widget = new QTreeWidget;						// tree for showing XML tags
+      // tree for showing XML tags
+      tree_widget = new QTreeWidget;
 
-										// Setup the tree and the window first:
-      tree_widget->header()->setResizeMode(QHeaderView::ResizeToContents);	// behavior of the header sections:
-										// "Interactive: User can resize sections"
-										// "Fixed: User cannot resize sections"
-										// "Stretch: Qt will automatically resize sections to fill available space"
-										// "ResizeToContents: Qt will automatically resize sections to optimal size"
+      // Setup the tree and the window first:
+      tree_widget->header()->setResizeMode(QHeaderView::ResizeToContents);
       tree_widget->setHeaderLabels(QStringList() << tr("(Sub)Sections/Parameters")
                                                  << tr("Value"));
-      tree_widget->setMouseTracking(true);					// enables mouse events e.g. showing ToolTips
-										// and documentation in the StatusLine
+
+      // enables mouse events e.g. showing ToolTips
+      // and documentation in the StatusLine
+      tree_widget->setMouseTracking(true);
       tree_widget->setEditTriggers(QAbstractItemView::DoubleClicked|
                                    QAbstractItemView::SelectedClicked|
                                    QAbstractItemView::EditKeyPressed);
@@ -53,18 +54,14 @@ namespace dealii
       tree_widget->setContextMenuPolicy(Qt::ActionsContextMenu);
       context_menu = new QMenu(tree_widget);
 
-										// set which actions will initiate item editing: Editing starts when:
-										// DoubleClicked: an item is double clicked
-										// SelectedClicked: clicking on an already selected item
-										// EditKeyPressed: the platform edit key has been pressed over an item
-										// AnyKeyPressed: any key is pressed over an item
+      // set the delegate for editing items
+      tree_widget->setItemDelegate(new ParameterDelegate(1));
 
-      tree_widget->setItemDelegate(new ParameterDelegate(1));			// set the delegate for editing items
+      setCentralWidget(tree_widget);
 
-      setCentralWidget(tree_widget);									// connect: if the tree changes, the window will know
-
-      connect(tree_widget, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT(set_documentation_text(QTreeWidgetItem *, QTreeWidgetItem *)));         // and connect
-      connect(tree_widget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this, SLOT(item_changed(QTreeWidgetItem *, int)));         // and connect
+      connect(tree_widget, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT(set_documentation_text(QTreeWidgetItem *, QTreeWidgetItem *)));
+      // connect: if the tree changes, the window will know
+      connect(tree_widget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this, SLOT(item_changed(QTreeWidgetItem *, int)));
       connect(tree_widget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(tree_was_modified()));
 
       QDockWidget *documentation_widget = new QDockWidget(tr("Parameter documentation:"), this);
@@ -76,17 +73,22 @@ namespace dealii
 
       addDockWidget(Qt::BottomDockWidgetArea, documentation_widget);
 
-      create_actions();								// create window actions as "Open",...
-      create_menus();								// and menus
+      // create window actions as "Open",...
+      create_actions();
+      // and menus
+      create_menus();
+      // and the toolbar
       create_toolbar();
 
       statusBar()->showMessage(tr("Ready, start editing by double-clicking or hitting F2!"));
-      setWindowTitle(tr("[*]parameterGUI"));					// set window title
+      setWindowTitle(tr("[*]parameterGUI"));
 
       showMaximized();
 
-      if (filename.size() > 3)							// if there is a file_name, try to load the file.
-        load_file(filename);							// a vliad file has the xml extension, so we require size() > 3
+      // if there is a file_name, try to load the file.
+      // a valid file has the xml extension, so we require size() > 3
+      if (filename.size() > 3)
+        load_file(filename);
 
       apply_settings();
     }
@@ -99,6 +101,8 @@ namespace dealii
       documentation_text_widget->clear();
       documentation_text_widget->insertPlainText(selected_item->text(3));
     }
+
+
 
     void MainWindow::item_changed(QTreeWidgetItem *item,
                                   int column)
@@ -143,40 +147,47 @@ namespace dealii
 
     void MainWindow::open()
     {
-      if (maybe_save())								// check, if the content was modified
+      // check, if the content was modified
+      if (maybe_save())
         {
-          QString  file_name =							// open a file dialog
+          // open a file dialog
+          QString  file_name =
                      QFileDialog::getOpenFileName(this, tr("Open XML Parameter File"),
                                                   QDir::currentPath(),
                                                   tr("XML Files (*.xml)"));
-          if (!file_name.isEmpty())						// if a file was selected,
-            load_file(file_name);						// load the content
-        };
+
+          // if a file was selected, load the content
+          if (!file_name.isEmpty())
+            load_file(file_name);
+        }
     }
 
 
 
     bool MainWindow::save()
     {
-      if (current_file.isEmpty())						// if there is no file
-        return save_as();							// to save changes, open a dialog
+      // if there is no file to save changes, open a dialog
+      if (current_file.isEmpty())
+        return save_as();
       else
-        return save_file(current_file);						// otherwise save
+        return save_file(current_file);
     }
 
 
 
     bool MainWindow::save_as()
     {
-      QString  file_name =							// open a file dialog
+      // open a file dialog
+      QString  file_name =
                  QFileDialog::getSaveFileName(this, tr("Save Parameter File"),
                                               QDir::currentPath(),
                                               tr("XML Files (*.xml);;PRM Files (*.prm)"));
 
-      if (file_name.isEmpty())							// if no file was selected
-        return false;								// return false
+      // return if a file was saved
+      if (file_name.isEmpty())
+        return false;
       else
-        return save_file(file_name);						// otherwise save content to file
+        return save_file(file_name);
     }
 
 
@@ -254,10 +265,11 @@ namespace dealii
 
     void MainWindow::tree_was_modified()
     {
-      setWindowModified(true);							// store, that the window was modified
-										// this is a function from the QMainWindow class
-										// and we use the windowModified mechanism to show a "*"
-										// in the window title, if content was modified
+      // store, that the window was modified
+      // this is a function from the QMainWindow class
+      // and we use the windowModified mechanism to show a "*"
+      // in the window title, if content was modified
+      setWindowModified(true);
     }
 
 
@@ -359,10 +371,13 @@ namespace dealii
 
     void MainWindow::closeEvent(QCloseEvent *event)
     {
-      if (maybe_save())								// reimplement the closeEvent from the QMainWindow class
-        event->accept();							// check, if we have to save modified content,
-      else									// if content was saved, accept the event,
-        event->ignore();							// otherwise ignore it
+      // Reimplement the closeEvent from the QMainWindow class.
+      // First check, if we have to save modified content.
+      // If not, or the content was saved, accept the event, otherwise ignore it
+      if (maybe_save())
+        event->accept();
+      else
+        event->ignore();
     }
 
 
@@ -371,11 +386,13 @@ namespace dealii
     {
       QStyle * style = tree_widget->style();
 
-      open_act = new QAction(tr("&Open..."), this);				// create actions
-      open_act->setIcon(style->standardPixmap(QStyle::SP_DialogOpenButton));    // and set icons
-      open_act->setShortcut(Qt::CTRL + Qt::Key_O);				// set a short cut
-      open_act->setStatusTip(tr("Open a XML file"));				// set a status tip
-      connect(open_act, SIGNAL(triggered()), this, SLOT(open()));		// and connect
+      // Create actions, and set icons, shortcuts, status tip and connect to
+      // activate the action.
+      open_act = new QAction(tr("&Open..."), this);
+      open_act->setIcon(style->standardPixmap(QStyle::SP_DialogOpenButton));
+      open_act->setShortcut(Qt::CTRL + Qt::Key_O);
+      open_act->setStatusTip(tr("Open a XML file"));
+      connect(open_act, SIGNAL(triggered()), this, SLOT(open()));
 
       save_act = new QAction(tr("&Save ..."), this);
       save_act->setIcon(style->standardPixmap(QStyle::SP_DialogSaveButton));
@@ -417,20 +434,22 @@ namespace dealii
 
     void MainWindow::create_menus()
     {
-        file_menu = menuBar()->addMenu(tr("&File"));				// create a file menu
-        file_menu->addAction(open_act);						// and add actions
-        file_menu->addAction(save_act);
-        file_menu->addAction(save_as_act);
-        file_menu->addSeparator();
-        file_menu->addAction(settings_act);
-        file_menu->addSeparator();
-        file_menu->addAction(exit_act);
+      // create a file menu, and add the entries
+      file_menu = menuBar()->addMenu(tr("&File"));
+      file_menu->addAction(open_act);
+      file_menu->addAction(save_act);
+      file_menu->addAction(save_as_act);
+      file_menu->addSeparator();
+      file_menu->addAction(settings_act);
+      file_menu->addSeparator();
+      file_menu->addAction(exit_act);
 
-        menuBar()->addSeparator();
+      menuBar()->addSeparator();
 
-        help_menu = menuBar()->addMenu(tr("&Help"));				// create a help menu
-        help_menu->addAction(about_act);
-        help_menu->addAction(about_qt_act);
+      // create a help menu
+      help_menu = menuBar()->addMenu(tr("&Help"));
+      help_menu->addAction(about_act);
+      help_menu->addAction(about_qt_act);
     }
 
 
@@ -439,7 +458,8 @@ namespace dealii
     {
       QToolBar *toolbar = new QToolBar(tr("Toolbar"),this);
 
-      toolbar->addAction(open_act);                                           // and add actions
+      // add entries
+      toolbar->addAction(open_act);
       toolbar->addAction(save_act);
       toolbar->addAction(save_as_act);
 
@@ -463,9 +483,10 @@ namespace dealii
 
     bool MainWindow::maybe_save()
     {
-      if (isWindowModified())							// if content was modified
+      // if content was modified, ask if content should be saved
+      if (isWindowModified())
         {
-          QMessageBox::StandardButton ret;					// ask, if content should be saved
+          QMessageBox::StandardButton ret;
           ret = QMessageBox::warning(this, tr("parameterGUI"),
                                      tr("The content has been modified.\n"
                                         "Do you want to save your changes?"),
@@ -486,7 +507,8 @@ namespace dealii
     {
       QFile  file(filename);
 
-      if (!file.open(QFile::WriteOnly | QFile::Text))				// open a file dialog
+      // open a file dialog
+      if (!file.open(QFile::WriteOnly | QFile::Text))
         {
           QMessageBox::warning(this, tr("parameterGUI"),
                                      tr("Cannot write file %1:\n%2.")
@@ -497,14 +519,16 @@ namespace dealii
 
       if (filename.endsWith(".xml",Qt::CaseInsensitive))
         {
-          XMLParameterWriter writer(tree_widget);                               // create a xml writer
-          if (!writer.write_xml_file(&file))                                    // and write the xml file
+          // create a xml writer and write the xml file
+          XMLParameterWriter writer(tree_widget);
+          if (!writer.write_xml_file(&file))
             return false;
         }
       else if (filename.endsWith(".prm",Qt::CaseInsensitive))
         {
-          PRMParameterWriter writer(tree_widget);                               // create a prm writer
-          if (!writer.write_prm_file(&file))                                    // and write the prm file
+          // create a prm writer and write the prm file
+          PRMParameterWriter writer(tree_widget);
+          if (!writer.write_prm_file(&file))
             return false;
         }
       else
@@ -517,8 +541,9 @@ namespace dealii
           return false;
         }
 
-      statusBar()->showMessage(tr("File saved"), 2000);				// if we succeed, show a message
-      set_current_file(filename);						// and reset the window
+      // if we succeed, show a message and reset the window
+      statusBar()->showMessage(tr("File saved"), 2000);
+      set_current_file(filename);
 
       return true;
     }
@@ -529,7 +554,8 @@ namespace dealii
     {
       QFile  file(filename);
 
-      if (!file.open(QFile::ReadOnly | QFile::Text))				// open the file
+      // open the file
+      if (!file.open(QFile::ReadOnly | QFile::Text))
         {
           QMessageBox::warning(this, tr("parameterGUI"),
                                      tr("Cannot read file %1:\n%2.")
@@ -538,9 +564,9 @@ namespace dealii
           return;
         };
 
-      tree_widget->clear();							// clear the tree
-
-      XMLParameterReader  xml_reader(tree_widget);				// and read the xml file
+      // clear the tree and read the xml file
+      tree_widget->clear();
+      XMLParameterReader xml_reader(tree_widget);
 
       if (!xml_reader.read_xml_file(&file))
         {
@@ -551,10 +577,12 @@ namespace dealii
         }
       else
         {
+          // show a message and set current file
           statusBar()->showMessage(tr("File loaded - Start editing by double-clicking or hitting F2"), 25000);
-          set_current_file(filename);						// show a message and set current file
+          set_current_file(filename);
 
-          show_message ();							// show some informations how values can be edited
+          // show some informations how values can be edited
+          show_message ();
         };
     }
 
@@ -562,27 +590,34 @@ namespace dealii
 
     void MainWindow::set_current_file(const QString  &filename)
     {
-										// We use the windowModified mechanism from the
-										// QMainWindow class to indicate in the window title,
-										// if the content was modified.
-										// If there is "[*]" in the window title, a * will
-										// added automatically at this position, if the
-										// window was modified.
-										// We set the window title to
-										// file_name[*] - XMLParameterHandler
+      // We use the windowModified mechanism from the
+      // QMainWindow class to indicate in the window title,
+      // if the content was modified.
+      // If there is "[*]" in the window title, a * will
+      // added automatically at this position, if the
+      // window was modified.
+      // We set the window title to
+      // file_name[*] - XMLParameterHandler
 
-      current_file = filename;							// set the (global) current file to file_name
+      // set the (global) current file to file_name
+      current_file = filename;
 
-      std::string win_title = (filename.toStdString());				// and create the window title,
+      // and create the window title,
+      std::string win_title = (filename.toStdString());
 
-      if (current_file.isEmpty())						// if file_name is empty
-        win_title = "[*]parameterGUI";						// set the title to our application name,
+      // if file_name is empty set the title to our application name
+      if (current_file.isEmpty())
+        win_title = "[*]parameterGUI";
       else
-        win_title += "[*] - parameterGUI";					// if there is a file_name, add the
-										// the file_name and a minus to the title
+        {
+          // if there is a file_name, add the
+          // the file_name and a minus to the title
+          win_title += "[*] - parameterGUI";
+        }
 
-      setWindowTitle(tr(win_title.c_str()));					// set the window title
-      setWindowModified(false);							// and reset window modified
+      // set the window title and reset window modified
+      setWindowTitle(tr(win_title.c_str()));
+      setWindowModified(false);
     }
 
 

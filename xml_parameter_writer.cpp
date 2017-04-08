@@ -26,21 +26,27 @@ namespace dealii
     XMLParameterWriter::XMLParameterWriter(QTreeWidget *tree_widget)
                       : tree_widget(tree_widget)
     {
-      xml.setAutoFormatting(true);						// enable auto-formatting
+      xml.setAutoFormatting(true);
     }
 
 
 
     bool XMLParameterWriter::write_xml_file(QIODevice *device)
     {
-      xml.setDevice(device);							// setup the output device
-      xml.writeStartDocument();							// write the head <?xml ... ?>
-      xml.writeStartElement("ParameterHandler");				// write the root element <ParameterHandler>
-										// loop over the elements
-      for (int i = 0; i < tree_widget->topLevelItemCount(); ++i)
-        write_item(tree_widget->topLevelItem(i));				// and write the items
+      xml.setDevice(device);
 
-      xml.writeEndDocument()		;					// close the first element
+      // write the head <?xml ... ?>
+      xml.writeStartDocument();
+
+      // write the root element <ParameterHandler>
+      xml.writeStartElement("ParameterHandler");
+
+      // loop over the elements and write them
+      for (int i = 0; i < tree_widget->topLevelItemCount(); ++i)
+        write_item(tree_widget->topLevelItem(i));
+
+      // close the first element
+      xml.writeEndDocument();
 
       return true;
     }
@@ -49,40 +55,44 @@ namespace dealii
 
     void XMLParameterWriter::write_item(QTreeWidgetItem *item)
     {
-      QString tag_name = mangle(item->text(0));					// store the element name
+      // store the element name
+      QString tag_name = mangle(item->text(0));
 
-      xml.writeStartElement(tag_name);						// and write <tag_name> to the file
+      // and write <tag_name> to the file
+      xml.writeStartElement(tag_name);
 
-      if (!item->text(1).isEmpty())						// if the "value"-entry of this item is not empty
-        {									// we have a parameter
+      // if the "value"-entry of this item is not empty, write a parameter
+      if (!item->text(1).isEmpty())
+        {
           xml.writeTextElement("value", item->data(1,Qt::EditRole).toString());
-          xml.writeTextElement("default_value", item->text(2));			// and we write its values
+          xml.writeTextElement("default_value", item->text(2));
           xml.writeTextElement("documentation", item->text(3));
           xml.writeTextElement("pattern", item->text(4));
           xml.writeTextElement("pattern_description", item->text(5));
         };
 
-      for (int i = 0; i < item->childCount(); ++i)				// go over the childrens recursively
+      // go over the childrens recursively
+      for (int i = 0; i < item->childCount(); ++i)
         write_item(item->child(i));
 
-      xml.writeEndElement();							// write closing </tag_name>
+      // write closing </tag_name>
+      xml.writeEndElement();
     }
 
 
 
     QString XMLParameterWriter::mangle (const QString &s)
     {
-      std::string  s_temp (s.toStdString()); 					// this function is copied from
-										// the ParameterHandler class
-      std::string u;								// and adapted to mangle QString
+      // this function is copied from the ParameterHandler class and adapted to mangle QString
+      std::string  s_temp (s.toStdString());
+
+      std::string u;
       u.reserve (s_temp.size());
 
       static const std::string allowed_characters
         ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 
-				   // for all parts of the string, see
-				   // if it is an allowed character or
-				   // not
+      // for all parts of the string, see if it is an allowed character or not
       for (unsigned int i=0; i<s_temp.size(); ++i)
         if (allowed_characters.find (s_temp[i]) != std::string::npos)
           u.push_back (s_temp[i]);

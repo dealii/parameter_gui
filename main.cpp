@@ -46,25 +46,32 @@
  */
 int main(int argc, char *argv[])
 {
-  Q_INIT_RESOURCE(application);						// init resources such as icons or graphics
+  // init resources such as icons or graphics
+  Q_INIT_RESOURCE(application);
 
   QApplication app(argc, argv);
 
-  QSplashScreen * splash = new QSplashScreen;				// setup a splash screen
+  // setup a splash screen
+  QSplashScreen * splash = new QSplashScreen;
   splash->setPixmap(QPixmap(":/images/logo_dealii_gui.png"));
   splash->show();
 
-  QTimer::singleShot(3000, splash, SLOT(close()));			// and close it after 3000 ms
+  // and close it after 3000 ms
+  QTimer::singleShot(3000, splash, SLOT(close()));
 
-  app.setApplicationName("parameterGUI for deal.II");			// setup the application name
+  // setup the application name
+  app.setApplicationName("parameterGUI for deal.II");
 
+  // give command line arguments to main_win
+  // if a parameter file is specified at the
+  // command line, give it to the MainWindow.
   dealii::ParameterGui::MainWindow * main_win =
-    new dealii::ParameterGui::MainWindow (argv[1]);			// give command line arguments to main_win
-									// if a parameter file is specified at the
-									// command line, give it to the MainWindow.
+    new dealii::ParameterGui::MainWindow (argv[1]);
 
-  QTimer::singleShot(1500, main_win, SLOT(show()));			// show the main window with a short delay
-									// so we can see the splash screen
+  // show the main window with a short delay
+  // so we can see the splash screen
+  QTimer::singleShot(1500, main_win, SLOT(show()));
+
   return app.exec();
 }
 /**@}*/

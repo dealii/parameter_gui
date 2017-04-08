@@ -55,6 +55,7 @@ namespace dealii
        * in the constructor by setting this flag <tt>BrowseType</tt>.
        */
       enum BrowseType {file = 0, directory = 1, files = 2};
+
       /**
        * Constructor. The type of the browse dialog can be specified
        * by the flag <tt>BrowseType</tt>, the default is <tt>file</tt>.
@@ -67,14 +68,17 @@ namespace dealii
        * Returns the size of the editor.
        */
       QSize  sizeHint() const;
+
       /**
        * Reimplemented from the QWidget class.
        */
       QSize  minimumSizeHint() const;
+
       /**
        * Returns the text of the line editor.
        */
       QString  text() const;
+
       /**
        * This pattern stores the type of the browse dialog.
        */
@@ -97,6 +101,7 @@ namespace dealii
        * This <tt>slot</tt> should be always called, if editing is finished.
        */
       void editing_finished();
+
       /**
        * This function opens a file- or a directory dialog as specified in the
        * constructor.
@@ -108,6 +113,7 @@ namespace dealii
        * The line editor.
        */
       QLineEdit *line_editor;
+
       /**
        * The browse button.
        */

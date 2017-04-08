@@ -55,6 +55,7 @@ namespace dealii
        * Constructor
        */
       InfoMessage (QWidget *parent = 0);
+
       /**
        * With this function the @p message which will be shown in the
        * dialog can be set.
@@ -78,28 +79,34 @@ namespace dealii
        * This variable stores, if the <tt>message</tt> should be shown again the next time.
        */
       bool show_again;
+
       /**
        * The <tt>Ok</tt> button.
        */
       QPushButton *ok;
+
       /**
        * The checkbox<tt>Show this message again</tt>.
        */
       QCheckBox *again;
+
       /**
        * The <tt>message</tt> editor.
        */
       QTextEdit *message;
+
       /**
        * An <tt>icon</tt> for the dialog.
        */
       QLabel *icon;
+
 #ifdef QT_SOFTKEYS_ENABLED
       /**
        * A action for pressing the <tt>Ok</tt> button.
        */
       QAction *ok_action;
 #endif
+
       /**
        * An object for storing <tt>settings</tt> in a file.
        */

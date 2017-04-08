@@ -48,6 +48,7 @@ namespace dealii
        * Parameter values from @p tree_widget will be written.
        */
       XMLParameterWriter (QTreeWidget *tree_widget);
+
       /**
        * This function writes the parameter values stored in <tt>tree_widget</tt>
        * to @p device in XML format. We use the QXmlStreamWriter class
@@ -73,6 +74,7 @@ namespace dealii
        * and <tt>write_item</tt> is called recursively to write the next <tt>item</tt>.
        */
       void write_item (QTreeWidgetItem *item);
+
       /**
        * Reimplemented from the @ref ParameterHandler class.
        * Mangle a string @p s so that it
@@ -80,12 +82,14 @@ namespace dealii
        * characters or spaces.
        */
       QString  mangle (const QString &s);
+
       /**
        * An QXmlStreamWriter object
        * which implements the functionalities
        * we need for writing parameters to XML files.
        */
       QXmlStreamWriter  xml;
+
       /**
        * A pointer to the QTreeWidget structure
        * which stores the parameters.
