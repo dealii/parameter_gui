@@ -4,6 +4,12 @@ It is copyrighted by Martin Steigemann and Wolfgang Bangerth and
 distributed under the same license as the deal.II library, i.e. The GNU
 Lesser General Public License (LGPL) version 2.1 or later.
 
+Requirements:
+=============
+
+- CMake
+- <a href="https://www.qt.io/developers/">Qt toolkit</a>
+
 Usage:
 ======
 
@@ -13,10 +19,7 @@ file in a format that the GUI can understand; this is done using the
 ParameterHandler::print_parameters() function with ParameterHandler::XML as
 second argument, as discussed in more detail below in the <i>Representation
 of Parameters</i> section. This file can then be loaded using the
-executable for the GUI, which should be located in
-<code>lib/bin/dealii_parameter_gui</code> of your deal.II installation,
-assuming that you have a sufficiently recent version of the <a
-href="http://qt.nokia.com/">Qt toolkit</a> installed.
+executable of this GUI.
 
 Once loaded, the GUI displays subsections and individual parameters in tree
 form (see also the discussion in the <i>Representation of Parameters</i>
