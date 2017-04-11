@@ -29,11 +29,8 @@ namespace dealii
   {
     MainWindow::MainWindow(const QString  &filename)
     {
-      // a file for user settings
-      QString  settings_file = QDir::currentPath() + "/settings.ini";
-
       // load settings
-      gui_settings = new QSettings (settings_file, QSettings::IniFormat);
+      gui_settings = new QSettings ("deal.II", "parameterGUI");
 
       // tree for showing XML tags
       tree_widget = new QTreeWidget;
