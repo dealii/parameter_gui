@@ -29,11 +29,8 @@ namespace dealii
   {
     MainWindow::MainWindow(const QString  &filename)
     {
-      // a file for user settings
-      QString  settings_file = QDir::currentPath() + "/settings.ini";
-
       // load settings
-      gui_settings = new QSettings (settings_file, QSettings::IniFormat);
+      gui_settings = new QSettings ("deal.II", "parameterGUI");
 
       // tree for showing XML tags
       tree_widget = new QTreeWidget;
@@ -83,7 +80,10 @@ namespace dealii
       statusBar()->showMessage(tr("Ready, start editing by double-clicking or hitting F2!"));
       setWindowTitle(tr("[*]parameterGUI"));
 
-      showMaximized();
+      gui_settings->beginGroup("MainWindow");
+      resize(gui_settings->value("size", QSize(800, 600)).toSize());
+      move(gui_settings->value("pos", QPoint(0, 0)).toPoint());
+      gui_settings->endGroup();
 
       // if there is a file_name, try to load the file.
       // a valid file has the xml extension, so we require size() > 3
@@ -375,7 +375,14 @@ namespace dealii
       // First check, if we have to save modified content.
       // If not, or the content was saved, accept the event, otherwise ignore it
       if (maybe_save())
-        event->accept();
+        {
+          gui_settings->beginGroup("MainWindow");
+          gui_settings->setValue("size", size());
+          gui_settings->setValue("pos", pos());
+          gui_settings->endGroup();
+
+          event->accept();
+        }
       else
         event->ignore();
     }
