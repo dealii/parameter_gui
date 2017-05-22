@@ -180,7 +180,7 @@ namespace dealii
       // open a file dialog
       QString  file_name =
                  QFileDialog::getSaveFileName(this, tr("Save Parameter File"),
-                                              QDir::currentPath(),
+                                              QDir::currentPath() + QDir::separator() + current_file,
                                               tr("XML Files (*.xml);;PRM Files (*.prm)"));
 
       // return if a file was saved
