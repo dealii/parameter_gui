@@ -177,11 +177,19 @@ namespace dealii
 
     bool MainWindow::save_as()
     {
+      const QString default_save_format = gui_settings->value("Settings/DefaultSaveFormat").toString();
+
+      QString filters;
+      if (default_save_format == "prm")
+        filters = tr("PRM Files (*.prm);;XML Files (*.xml)");
+      else
+        filters = tr("XML Files (*.xml);;PRM Files (*.prm)");
+
       // open a file dialog
       QString  file_name =
                  QFileDialog::getSaveFileName(this, tr("Save Parameter File"),
                                               QDir::currentPath() + QDir::separator() + current_file,
-                                              tr("XML Files (*.xml);;PRM Files (*.prm)"));
+                                              filters);
 
       // return if a file was saved
       if (file_name.isEmpty())
@@ -530,6 +538,8 @@ namespace dealii
           XMLParameterWriter writer(tree_widget);
           if (!writer.write_xml_file(&file))
             return false;
+
+          gui_settings->setValue("Settings/DefaultSaveFormat", "xml");
         }
       else if (filename.endsWith(".prm",Qt::CaseInsensitive))
         {
@@ -537,6 +547,8 @@ namespace dealii
           PRMParameterWriter writer(tree_widget);
           if (!writer.write_prm_file(&file))
             return false;
+
+          gui_settings->setValue("Settings/DefaultSaveFormat", "prm");
         }
       else
         {
