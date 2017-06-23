@@ -20,24 +20,44 @@ IF("${DEAL_II_EXECUTABLE_RELDIR}" STREQUAL "")
   SET(DEAL_II_EXECUTABLE_RELDIR "bin")
 ENDIF()
 
-FIND_PACKAGE(Qt4 REQUIRED QtCore QtGui QtXml)
-MARK_AS_ADVANCED(QT_QMAKE_EXECUTABLE)
+FIND_PACKAGE(Qt5 COMPONENTS Core Gui Xml Widgets)
 
-INCLUDE(${QT_USE_FILE})
+IF(${Qt5_FOUND})
+ELSE()
+  FIND_PACKAGE(Qt4 REQUIRED QtCore QtGui QtXml)
+  INCLUDE(${QT_USE_FILE})
+ENDIF()
+
+MARK_AS_ADVANCED(QT_QMAKE_EXECUTABLE)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
-QT4_WRAP_CPP(SOURCE_MOC
-  browse_lineedit.h
-  info_message.h
-  settings_dialog.h
-  mainwindow.h
-  parameter_delegate.h
-  )
+IF(${Qt5_FOUND})
+  QT5_WRAP_CPP(SOURCE_MOC
+    browse_lineedit.h
+    info_message.h
+    settings_dialog.h
+    mainwindow.h
+    parameter_delegate.h
+    )
 
-QT4_ADD_RESOURCES(SOURCE_RCC
-  application.qrc
-  )
+  QT5_ADD_RESOURCES(SOURCE_RCC
+    application.qrc
+    )
+ELSE()
+  QT4_WRAP_CPP(SOURCE_MOC
+    browse_lineedit.h
+    info_message.h
+    settings_dialog.h
+    mainwindow.h
+    parameter_delegate.h
+    )
+
+  QT4_ADD_RESOURCES(SOURCE_RCC
+    application.qrc
+    )
+ENDIF()
+
 
 ADD_EXECUTABLE(parameter_gui_exe
   browse_lineedit.cpp
@@ -68,3 +88,7 @@ EXPORT(TARGETS parameter_gui_exe
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
   APPEND
   )
+
+IF(${Qt5_FOUND})
+  QT5_USE_MODULES(parameter_gui_exe Core Gui Xml Widgets)
+ENDIF()

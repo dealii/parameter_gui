@@ -14,10 +14,13 @@
 // ---------------------------------------------------------------------
 
 
-#include <QtGui>
-
 #include "settings_dialog.h"
 
+#if QT_VERSION >= 0x050000
+#include <QtWidgets>
+#else
+#include <QtGui>
+#endif
 
 namespace dealii
 {

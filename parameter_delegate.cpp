@@ -14,12 +14,15 @@
 // ---------------------------------------------------------------------
 
 
-#include <QtGui>
-
 #include "parameter_delegate.h"
 
 #include <limits>
 
+#if QT_VERSION >= 0x050000
+#include <QtWidgets>
+#else
+#include <QtGui>
+#endif
 
 namespace dealii
 {

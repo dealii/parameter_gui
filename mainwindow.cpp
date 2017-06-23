@@ -14,14 +14,17 @@
 // ---------------------------------------------------------------------
 
 
-#include <QtGui>
-
 #include "mainwindow.h"
 #include "parameter_delegate.h"
 #include "xml_parameter_reader.h"
 #include "xml_parameter_writer.h"
 #include "prm_parameter_writer.h"
 
+#if QT_VERSION >= 0x050000
+#include <QtWidgets>
+#else
+#include <QtGui>
+#endif
 
 namespace dealii
 {
@@ -36,7 +39,11 @@ namespace dealii
       tree_widget = new QTreeWidget;
 
       // Setup the tree and the window first:
+#if QT_VERSION >= 0x050000
+      tree_widget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+#else
       tree_widget->header()->setResizeMode(QHeaderView::ResizeToContents);
+#endif
       tree_widget->setHeaderLabels(QStringList() << tr("(Sub)Sections/Parameters")
                                                  << tr("Value"));
 

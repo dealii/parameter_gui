@@ -14,10 +14,13 @@
 // ---------------------------------------------------------------------
 
 
-#include <QtGui>
-
 #include "prm_parameter_writer.h"
 
+#if QT_VERSION >= 0x050000
+#include <QtWidgets>
+#else
+#include <QtGui>
+#endif
 
 namespace dealii
 {
@@ -36,7 +39,7 @@ namespace dealii
       for (int i = 0; i < tree_widget->topLevelItemCount(); ++i)
         {
         const QString item_string = item_to_string(tree_widget->topLevelItem(i),0);
-        device->write(item_string.toAscii());
+        device->write(item_string.toLatin1());
         }
 
       return true;
@@ -75,7 +78,7 @@ namespace dealii
 
           if (!item_string.isEmpty())
             {
-              item_string.push_front("subsection " + item->text(0).toAscii() + "\n");
+              item_string.push_front("subsection " + item->text(0).toLatin1() + "\n");
               for (unsigned int i=0; i<indentation_level;++i)
                 item_string.push_front("  ");
 
