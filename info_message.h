@@ -54,7 +54,8 @@ namespace dealii
       /**
        * Constructor
        */
-      InfoMessage (QWidget *parent = 0);
+      InfoMessage (QSettings *settings,
+                   QWidget *parent = 0);
 
       /**
        * With this function the @p message which will be shown in the
