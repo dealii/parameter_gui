@@ -23,7 +23,8 @@ namespace dealii
 {
   namespace ParameterGui
   {
-    InfoMessage::InfoMessage(QWidget *parent)
+    InfoMessage::InfoMessage(QSettings *parent_settings,
+                             QWidget *parent)
                : QDialog(parent, 0)
     {
       // this variable stores, if the
@@ -72,10 +73,7 @@ namespace dealii
       grid->setColumnStretch(1, 42);
       grid->setRowStretch(0, 42);
 
-      // load settings from an ini-file
-      QString  settings_file = QDir::currentPath() + "/settings.ini";
-
-      settings = new QSettings (settings_file, QSettings::IniFormat);
+      settings = parent_settings;
 
       // we store settings of this class in the group infoMessage
       settings->beginGroup("infoMessage");

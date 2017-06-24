@@ -286,7 +286,7 @@ namespace dealii
     {
       QString title = "parameterGUI";
 
-      info_message = new InfoMessage(this);
+      info_message = new InfoMessage(gui_settings,this);
 
       info_message->setWindowTitle(title);
       info_message->setInfoMessage(tr("Start Editing by double-clicking on the parameter value or"
