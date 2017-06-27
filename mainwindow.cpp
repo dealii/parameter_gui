@@ -20,6 +20,7 @@
 #include "xml_parameter_writer.h"
 #include "prm_parameter_writer.h"
 
+#include <QtGlobal>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets>
 #else

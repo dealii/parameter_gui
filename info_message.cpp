@@ -16,11 +16,11 @@
 
 #include "info_message.h"
 
-#if QT_VERSION >= 0x050000
-#include <QtWidgets>
-#else
-#include <QtGui>
-#endif
+#include <QErrorMessage>
+#include <QDir>
+#include <QPushButton>
+#include <QGridLayout>
+#include <QMessageBox>
 
 namespace dealii
 {

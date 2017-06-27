@@ -16,12 +16,6 @@
 
 #include "xml_parameter_reader.h"
 
-#if QT_VERSION >= 0x050000
-#include <QtWidgets>
-#else
-#include <QtGui>
-#endif
-
 namespace dealii
 {
   namespace ParameterGui
