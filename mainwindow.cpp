@@ -226,7 +226,7 @@ namespace dealii
       trAboutparameterGUItext = QMessageBox::tr(
         "<p>The parameterGUI is a graphical user interface for editing XML parameter files "
         "created by the ParameterHandler class of deal.II. Please see "
-        "<a href=\"http://www.dealii.org/7.0.0/doxygen/deal.II/classParameterHandler.html\">dealii.org/doc</a> for more information. "
+        "<a href=\"http://dealii.org/developer/doxygen/deal.II/classParameterHandler.html\">dealii.org/doc</a> for more information. "
         "The parameterGUI parses XML files into a tree structure and provides "
         " special editors for different types of parameters.</p>"
 
@@ -234,20 +234,17 @@ namespace dealii
         "Parameters can be edited by (double-)clicking on the value or "
         "by pressing the platform edit key (F2 on Linux) over an parameter item.</p>"
 
-        "<p><b>Editors for parameter values:</b>"
-        " <ul>"
-        "  <li>Integer- and Double-type parameters: SpinBox</li>"
-        "  <li>Booleans: ComboBox</li>"
-        "  <li>Selection: ComboBox</li>"
-        "  <li>File- and DirectoryName parameters: BrowseLineEditor</li>"
-        "  <li>Anything|MultipleSelection|List: LineEditor</li>"
-        " </ul>"
+        "<p><b>Editors for parameter values:</b><br>"
+        "Editor fields are aware of the type of the parameter, and show reasonable "
+        "input fields including (where possible) error checking."
         "</p>"
 
         "<p>Please see <a href=\"http://www.dealii.org\">dealii.org</a> for more information</p>"
         "<p><b>Authors:</b><br> "
         "Martin Steigemann,  <a href=\"mailto:martin.steigemann@mathematik.uni-kassel.de\">martin.steigemann@mathematik.uni-kassel.de</a><br>"
-        "Wolfgang Bangerth,  <a href=\"mailto:bangerth@math.tamu.edu\">bangerth@math.tamu.edu</a></p>"
+        "Rene Gassmoeller,   <a href=\"mailto:rene.gassmoeller@mailbox.org\">rene.gassmoeller@mailbox.org</a><br>"
+        "Wolfgang Bangerth,  <a href=\"mailto:bangerth@colostate.edu\">bangerth@colostate.edu</a><br>"
+        "</p>"
         );
 
       QMessageBox *msg_box = new QMessageBox;
