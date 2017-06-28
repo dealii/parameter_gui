@@ -14,10 +14,12 @@
 // ---------------------------------------------------------------------
 
 
-#include <QtGui>
-
 #include "settings_dialog.h"
 
+#include <QErrorMessage>
+#include <QFontDialog>
+#include <QPushButton>
+#include <QFormLayout>
 
 namespace dealii
 {

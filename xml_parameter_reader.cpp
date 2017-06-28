@@ -14,10 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-#include <QtGui>
-
 #include "xml_parameter_reader.h"
-
 
 namespace dealii
 {

@@ -13,11 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-
-#include <QtGui>
-
 #include "browse_lineedit.h"
 
+#include <QHBoxLayout>
 
 namespace dealii
 {

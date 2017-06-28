@@ -14,10 +14,13 @@
 // ---------------------------------------------------------------------
 
 
-#include <QtGui>
-
 #include "info_message.h"
 
+#include <QErrorMessage>
+#include <QDir>
+#include <QPushButton>
+#include <QGridLayout>
+#include <QMessageBox>
 
 namespace dealii
 {

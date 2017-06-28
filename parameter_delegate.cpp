@@ -14,12 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-#include <QtGui>
-
 #include "parameter_delegate.h"
 
 #include <limits>
-
 
 namespace dealii
 {

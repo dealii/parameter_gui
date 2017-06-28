@@ -14,10 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-#include <QtGui>
-
 #include "xml_parameter_writer.h"
-
 
 namespace dealii
 {
