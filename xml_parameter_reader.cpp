@@ -217,7 +217,7 @@ namespace dealii
                   QRegExp  rx_string("\\b(Anything|FileName|DirectoryName|Selection|List|MultipleSelection)\\b"),	
                            rx_integer("\\b(Integer)\\b"),
                            rx_double("\\b(Float|Floating|Double)\\b"),
-                           rx_bool("\\b(Selection true|false)\\b");
+                           rx_bool("\\b(Bool)\\b");
 
                   // store the type "Anything" or "Filename" as a QString
                   if (rx_string.indexIn (pattern_description) != -1)
@@ -273,7 +273,7 @@ namespace dealii
                       else if (test.exactMatch("false"))
                         value = false;
                       else
-                        xml.raiseError(QObject::tr("Cannot convert boolen type to boolean!"));
+                        xml.raiseError(QObject::tr("Cannot convert boolean type to boolean!"));
 
                       // this is needed because we use for booleans the standard delegate
                       parent->setText(1, "");
